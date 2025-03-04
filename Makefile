@@ -23,7 +23,7 @@ up-agent: ## Inicia el servicio de la aplicación principal
 up-jupyter: ## Inicia el servicio de Jupyter Notebook
 	docker-compose up jupyter
 
-up-all: ## Inicia todos los servicios definidos en docker-compose.yml
+up: ## Inicia todos los servicios definidos en docker-compose.yml
 	docker-compose up
 
 up-build: ## Reconstruye e inicia todos los servicios (usar después de cambios en Dockerfile)
@@ -43,7 +43,7 @@ exec: ## Abre una terminal bash dentro del contenedor ai-agent
 exec-jupyter: ## Abre una terminal bash dentro del contenedor jupyter
 	docker-compose exec jupyter bash
 
-restart: ## Reinicia el servicio ai-agent
+restart-agent: ## Reinicia el servicio ai-agent
 	docker-compose restart ai-agent
 
 restart-jupyter: ## Reinicia el servicio jupyter
