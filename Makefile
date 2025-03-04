@@ -1,4 +1,4 @@
-.PHONY: dev jupyter test lint logs logs-jupyter exec exec-jupyter restart restart-jupyter stop down down-v build ps top clean prune help
+.PHONY: dev jupyter test lint up up-jupyter up-all up-build logs logs-jupyter exec exec-jupyter restart restart-jupyter stop down down-v build ps top clean prune help
 
 # === Comandos de desarrollo ===
 
@@ -14,6 +14,20 @@ test: ## Ejecuta las pruebas con pytest
 lint: ## Formatea el código con black y ordena imports con isort
 	black .
 	isort .
+
+# === Comandos principales de Docker ===
+
+up-agent: ## Inicia el servicio de la aplicación principal
+	docker-compose up ai-agent
+
+up-jupyter: ## Inicia el servicio de Jupyter Notebook
+	docker-compose up jupyter
+
+up-all: ## Inicia todos los servicios definidos en docker-compose.yml
+	docker-compose up
+
+up-build: ## Reconstruye e inicia todos los servicios (usar después de cambios en Dockerfile)
+	docker-compose up --build
 
 # === Comandos de gestión de Docker ===
 
