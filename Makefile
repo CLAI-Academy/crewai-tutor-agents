@@ -3,10 +3,11 @@
 # === Comandos de desarrollo ===
 
 dev: ## Ejecuta la aplicación principal
-	python -m app.main
+	poetry run python -m app.main
 
-jupyter: ## Inicia Jupyter Notebook sin contraseña
-	jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token='' --NotebookApp.password=''
+jupyter: ## Inicia Jupyter Notebook usando Poetry
+	poetry run jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token='' --NotebookApp.password=''
+
 
 test: ## Ejecuta las pruebas con pytest
 	pytest
