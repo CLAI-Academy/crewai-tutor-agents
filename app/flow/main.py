@@ -3,7 +3,7 @@ from random import randint
 
 from pydantic import BaseModel
 from crewai.flow.flow import Flow, listen, start
-from .crews.poem_crew.poem_crew import PoemCrew
+from .crews.financial_crew.financial_crew import FinancialCrew
 
 class PoemState(BaseModel):
     sentence_count: int = 1
@@ -19,7 +19,7 @@ class PoemFlow(Flow[PoemState]):
     @listen(generate_sentence_count)
     def generate_poem(self):
         print("Generating poem")
-        result = PoemCrew().crew().kickoff(inputs={"sentence_count": self.state.sentence_count})
+        result = FinancialCrew().crew().kickoff(inputs={"sentence_count": self.state.sentence_count})
 
         print("Poem generated", result.raw)
         self.state.poem = result.raw

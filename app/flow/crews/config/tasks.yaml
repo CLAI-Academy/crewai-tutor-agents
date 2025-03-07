@@ -1,0 +1,49 @@
+analize_cashflow:
+  description: >
+    Analize the cashflow of the following text:
+    <text>
+    {prompt}
+    </text>
+  expected_output: >
+    Returns the avaible quantity to invest from the user's cashflow
+
+generate_investment_scenarios:
+  description: >
+    Generate investment scenarios based on the following text, you can generate a scenario with high volatility or low volatility, the amount of money to invest and the time to invest is the same for
+    all the scenarios, if the user wants risk, you can generate a scenario with high volatility(crypto with high volatility), if the user wants to be more conservative, 
+    you can generate a scenario with low volatility(actions with low volatility):
+    Extract the risk and the quantity of money to invest from the following text:
+    <text>
+    {prompt}
+    </text>
+  expected_output: >
+    Returns the investment scenarios with the following format:
+    <example>
+    - Scenario 1:
+      - Risk: High
+      - Quantity of money to invest: 1000
+      - Time to invest: 1 year
+      - Aproximate return: 10%
+      - Dividend yield: 2%(if applicable)
+    - Scenario 2:
+      - Risk: Low
+      - Quantity of money to invest: 1000
+      - Time to invest: 1 year
+      - Aproximate return: 5%
+      - Dividend yield: 1%(if applicable)
+    </example>
+
+optimizated_investment_scenarios:
+  description: >
+    Optimize the investment scenarios based on the output of the analize_cashflow task and the investment scenarios generated in the generate_investment_scenarios task, generates a report
+    in format markdown,
+  expected_output: >
+    Returns the optimized investment scenarios in the format markdown, doing table with the following columns:
+    - Scenario
+    - Risk
+    - Quantity of money to invest
+    - Time to invest
+    - Aproximate return
+    - Dividend yield
+    - Total return (return + dividend yield in percentage)
+    - Conversion of the original quantity of money to invest with the total return
