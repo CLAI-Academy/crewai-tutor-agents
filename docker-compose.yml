@@ -12,6 +12,16 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - LOG_LEVEL=DEBUG
     command: make dev
+    develop:
+      watch:
+        - action: sync
+          path: ./
+          target: /app
+          ignore:
+            - .git/
+            - node_modules/
+            - __pycache__/
+            - "*.pyc"
 
   jupyter:
     build:
@@ -25,3 +35,13 @@ services:
       - PYTHONUNBUFFERED=1
       - OPENAI_API_KEY=${OPENAI_API_KEY}
     command: make jupyter
+    develop:
+      watch:
+        - action: sync
+          path: ./
+          target: /app
+          ignore:
+            - .git/
+            - node_modules/
+            - __pycache__/
+            - "*.pyc"

@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "crewai-tutor-agents"
+version = "0.1.0"
+description = "AI Agents Project using CrewAI"
+authors = ["Your Name <your.email@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+crewai = "*"
+crewai-tools = "*"
+pydantic = "^2.10.6"
+fastapi = "^0.115.11"
+uvicorn = "^0.27.0"
+python-dotenv = "^0.21.0"
+loguru = "^0.6.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.0.0"
+black = "^23.0.0"
+jupyter = "^1.0.0"
+notebook = "^7.0.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
