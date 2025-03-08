@@ -1,11 +1,10 @@
 from crewai import Agent, Crew, Task, LLM, Process
-from dotenv import load_dotenv
-from tools.tool import CryptoDataTool, ActionsDataTool
+from app.tools.financial_crew.tool import CryptoDataTool, ActionsDataTool
 import yaml
 
 files = {
-    'agents': 'app/flow/crews/config',
-    'tasks': 'app/flow/crews/config'
+    'agents': 'app/config/finances_config/agents.yaml',
+    'tasks': 'app/config/finances_config/tasks.yaml'
 }
 
 # Load configurations from YAML files
@@ -69,4 +68,4 @@ crew = Crew(
 )
 
 if __name__ == "__main__":
-    crew.kickoff(inputs={"prompt": "Cobro 600 euros al mes, y quiero invertir 1000 euros en 2 años, que me recomiendas?"})
+    crew.kickoff(inputs={"prompt": "Cobro 200 euros al mes, y quiero invertir 2500 euros en 2 años, que me recomiendas?"})

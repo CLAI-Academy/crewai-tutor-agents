@@ -43,7 +43,8 @@ financial_simulator:
     3. Visual representation of simulated growth trajectories
     4. Clear explanation of methodology used for analysis
     5. Disclaimers about market volatility and that past performance doesn't guarantee future results
-
+    6. The response must be in spanish and you need to explain all the scenarios and in what invest in each case
+    
 financial_optimizer:
   role: "Investment Portfolio Advisor"
   goal: "Analyze investment recommendations and provide structured, actionable investment advice with financial projections"
@@ -65,3 +66,4 @@ financial_optimizer:
     3. Risk assessment section for each investment option
     4. Monthly cash flow projection table showing potential growth over 12 months
     5. Concluding remarks with key considerations for the investor
+    6. The response must be in spanish and you need to explain all the scenarios and in what invest in each case

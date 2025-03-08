@@ -25,12 +25,18 @@ generate_investment_scenarios:
       - Time to invest: 1 year
       - Aproximate return: 10%
       - Dividend yield: 2%(if applicable)
+      - Investment type: Crypto
+      - Name of the investment: Bitcoin
+      - Monthly income: 100 euros
     - Scenario 2:
       - Risk: Low
       - Quantity of money to invest: 1000
       - Time to invest: 1 year
       - Aproximate return: 5%
       - Dividend yield: 1%(if applicable)
+      - Investment type: Actions
+      - Name of the investment: Company X
+      - Monthly income: 100 euros
     </example>
 
 optimizated_investment_scenarios:
@@ -38,7 +44,7 @@ optimizated_investment_scenarios:
     Optimize the investment scenarios based on the output of the analize_cashflow task and the investment scenarios generated in the generate_investment_scenarios task, generates a report
     in format markdown,
   expected_output: >
-    Returns the optimized investment scenarios in the format markdown, doing table with the following columns:
+    Returns the optimized investment scenarios in spanish in the format markdown, doing table with the following columns:
     - Scenario
     - Risk
     - Quantity of money to invest
@@ -47,3 +53,6 @@ optimizated_investment_scenarios:
     - Dividend yield
     - Total return (return + dividend yield in percentage)
     - Conversion of the original quantity of money to invest with the total return
+    - Investment type
+    - Name of the investment
+    - Monthly income
