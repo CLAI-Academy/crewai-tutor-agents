@@ -1,80 +1,80 @@
 .PHONY: dev jupyter test lint up up-jupyter up-all up-build logs logs-jupyter exec exec-jupyter restart restart-jupyter stop down down-v build ps top clean prune help
 
-# === Comandos de desarrollo ===
+# === Development Commands ===
 
-dev: ## Ejecuta la aplicación principal
+dev: ## Runs the main application
 	python -m app.main
 
-jupyter: ## Inicia Jupyter Notebook usando Poetry
+jupyter: ## Starts Jupyter Notebook using Poetry
 	jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token='' --NotebookApp.password=''
 
 
-test: ## Ejecuta las pruebas con pytest
+test: ## Runs tests with pytest
 	pytest
 
-lint: ## Formatea el código con black y ordena imports con isort
+lint: ## Formats code with black and sorts imports with isort
 	black .
 	isort .
 
-# === Comandos principales de Docker ===
+# === Main Docker Commands ===
 
-up-agent: ## Inicia el servicio de la aplicación principal
+up-agent: ## Starts the main application service
 	docker-compose up ai-agent
 
-up-jupyter: ## Inicia el servicio de Jupyter Notebook
+up-jupyter: ## Starts the Jupyter Notebook service
 	docker-compose up jupyter
 
-up: ## Inicia todos los servicios definidos en docker-compose.yml
+up: ## Starts all services defined in docker-compose.yml
 	docker-compose up
 
-up-build: ## Reconstruye e inicia todos los servicios (usar después de cambios en Dockerfile)
+up-build: ## Rebuilds and starts all services (use after changes in Dockerfile)
 	docker-compose up --build
 
-# === Comandos de gestión de Docker ===
+# === Docker Management Commands ===
 
-logs: ## Muestra logs en tiempo real del servicio ai-agent
+logs: ## Shows real-time logs of the ai-agent service
 	docker-compose logs -f ai-agent
 
-logs-jupyter: ## Muestra logs en tiempo real del servicio jupyter
+logs-jupyter: ## Shows real-time logs of the jupyter service
 	docker-compose logs -f jupyter
 
-exec: ## Abre una terminal bash dentro del contenedor ai-agent
+exec: ## Opens a bash terminal inside the ai-agent container
 	docker-compose exec ai-agent bash
 
-exec-jupyter: ## Abre una terminal bash dentro del contenedor jupyter
+exec-jupyter: ## Opens a bash terminal inside the jupyter container
 	docker-compose exec jupyter bash
 
-restart-agent: ## Reinicia el servicio ai-agent
+restart-agent: ## Restarts the ai-agent service
 	docker-compose restart ai-agent
 
-restart-jupyter: ## Reinicia el servicio jupyter
+restart-jupyter: ## Restarts the jupyter service
 	docker-compose restart jupyter
 
-stop: ## Detiene todos los servicios sin eliminar contenedores
+stop: ## Stops all services without removing containers
 	docker-compose stop
 
-down: ## Detiene y elimina contenedores, redes creadas por docker-compose up
+down: ## Stops and removes containers, networks created by docker-compose up
 	docker-compose down
 
-down-v: ## Detiene y elimina contenedores, redes y volúmenes (¡CUIDADO! Elimina datos persistentes)
+down-v: ## Stops and removes containers, networks, and volumes (WARNING! Removes persistent data)
 	docker-compose down -v
 
-build: ## Reconstruye los contenedores (útil después de cambios en Dockerfile o requirements.txt)
+build: ## Rebuilds the containers (useful after changes in Dockerfile or requirements.txt)
 	docker-compose build
 
-ps: ## Muestra el estado de todos los contenedores gestionados por docker-compose
+ps: ## Displays the status of all containers managed by docker-compose
 	docker-compose ps
 
-top: ## Muestra los procesos en ejecución dentro de los contenedores
+top: ## Shows running processes inside the containers
 	docker-compose top
 
-clean: ## Elimina todas las imágenes no utilizadas y contenedores detenidos
+clean: ## Removes all unused images and stopped containers
 	docker system prune -f
 
-prune: ## Limpieza profunda: elimina todas las imágenes, contenedores, redes y volúmenes no utilizados
+prune: ## Deep cleanup: removes all unused images, containers, networks, and volumes
 	docker system prune -a --volumes -f
 
-help: ## Muestra esta ayuda
+help: ## Displays this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $1, $2}'
 
 .DEFAULT_GOAL := help
