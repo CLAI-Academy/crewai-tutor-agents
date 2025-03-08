@@ -1,6 +1,7 @@
 # Git
 .git
 .gitignore
+.github
 
 # Python
 __pycache__/
@@ -26,21 +27,69 @@ var/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+notebooks/
 
-# Entornos virtuales
+# Virtual Environments
 venv/
 ENV/
+.env
+.venv
+
+# Poetry
+poetry.lock
+
+# Docker files
+Dockerfile
+docker-compose.yml
+docker-compose*.yml
+.dockerignore
 
 # IDE
 .idea/
 .vscode/
 *.swp
 *.swo
+.DS_Store
 
 # Logs
 logs/
 *.log
 
-# Archivos de configuración local
-.env
-.env.local
+# Configuration files (careful with this - you might need some config files in Docker)
+# Uncomment only if you're sure you don't need these in your container
+# *.ini
+# *.conf
+# *.yml
+# *.yaml
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*,cover
+.hypothesis/
+.pytest_cache/
+
+# Documentation
+docs/
+README.md
+LICENSE
+*.md
+
+# Credentials (IMPORTANT - don't include sensitive files in Docker builds)
+credentials.json
+*_key.json
+*.pem
+*.key
+
+# Large files that shouldn't be in Docker images
+*.csv
+*.sqlite
+*.db
+*.tar
+*.gz
+*.zip
