@@ -1,29 +1,29 @@
 [tool.poetry]
 name = "crewai-tutor-agents"
 version = "0.1.0"
-description = ""
-authors = ["saul <gomezjimenezsaul@gmail.com>"]
-
-packages = [{include = "app"}]  # Esto es clave para que detecte app/ como paquete
+description = "AI Agents Project using CrewAI"
+authors = ["Your Name <your.email@example.com>"]
+packages = [
+    {include = "app"}
+]
+package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.12"
 crewai = "*"
 crewai-tools = "*"
-pydantic = ">=2.0.0"
-fastapi = ">=0.95.0"
-uvicorn = ">=0.20.0"
-python-dotenv = ">=0.21.0"
-loguru = ">=0.6.0"
-jupyter = ">=1.0.0"
-notebook = ">=7.0.0"
-pydantic-settings = "^2.8.1"
-
+pydantic = "^2.10.6"
+fastapi = "^0.115.11"
+uvicorn = "^0.27.0"
+python-dotenv = "^0.21.0"
+loguru = "^0.6.0"
 
 [tool.poetry.group.dev.dependencies]
-pytest = ">=7.0.0"
-black = ">=23.0.0"
+pytest = "^7.0.0"
+black = "^23.0.0"
+jupyter = "^1.0.0"
+notebook = "^7.0.0"
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
+requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

@@ -2,11 +2,13 @@ FROM python:3.12-slim
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=off \
     PYTHONDONTWRITEBYTECODE=1 \
     MAKEFLAGS="-j4" \
     PYTHONPATH=/app \
-    POETRY_VIRTUALENVS_CREATE=false
+    POETRY_VERSION=2.1.1 \
+    POETRY_HOME="/opt/poetry" \
+    POETRY_VIRTUALENVS_CREATE=false \
+    POETRY_NO_INTERACTION=1
 
 WORKDIR /app
 
@@ -22,19 +24,22 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Poetry inside the container
-RUN pip install poetry
+# Install Poetry
+RUN curl -sSL https://install.python-poetry.org | python3 - && \
+    cd /usr/local/bin && \
+    ln -s /opt/poetry/bin/poetry && \
+    poetry config virtualenvs.create false
 
-# Copy Poetry files (only these first to optimize caching)
-COPY README.md pyproject.toml poetry.lock* ./
-# Copy the app directory (what defines your package) so Poetry can "see" it
-COPY app/ app/
-# Configure Poetry to NOT create virtual environments inside the container
-# and install dependencies
-RUN poetry config virtualenvs.create false && \
-    poetry install --with dev --no-interaction --no-ansi
+# Install Poetry plugin for export
+RUN poetry self add poetry-plugin-export
 
-# Copy the rest of the application
+# Copy poetry configuration files
+COPY pyproject.toml poetry.lock* ./
+
+# Install dependencies
+RUN poetry install --no-root --without dev
+
+# Copy application code
 COPY . .
 
 # Create non-root user for security
