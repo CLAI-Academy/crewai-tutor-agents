@@ -33,8 +33,8 @@ test: ## Run tests with pytest
 	pytest
 
 lint: ## Format code with black and sort imports with isort
-	black .
-	isort .
+    poetry run black .
+    poetry run isort .
 
 # === Main Docker Commands ===
 

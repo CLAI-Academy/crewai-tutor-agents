@@ -5,12 +5,13 @@ from pydantic import BaseModel
 from crewai.flow.flow import Flow, listen, start
 from .crews.poem_crew.poem_crew import PoemCrew
 
+
 class PoemState(BaseModel):
     sentence_count: int = 1
     poem: str = ""
 
-class PoemFlow(Flow[PoemState]):
 
+class PoemFlow(Flow[PoemState]):
     @start()
     def generate_sentence_count(self):
         print("Generating sentence count")
@@ -19,7 +20,11 @@ class PoemFlow(Flow[PoemState]):
     @listen(generate_sentence_count)
     def generate_poem(self):
         print("Generating poem")
-        result = PoemCrew().crew().kickoff(inputs={"sentence_count": self.state.sentence_count})
+        result = (
+            PoemCrew()
+            .crew()
+            .kickoff(inputs={"sentence_count": self.state.sentence_count})
+        )
 
         print("Poem generated", result.raw)
         self.state.poem = result.raw
@@ -30,6 +35,7 @@ class PoemFlow(Flow[PoemState]):
         with open("poem.txt", "w") as f:
             f.write(self.state.poem)
 
+
 def kickoff():
     poem_flow = PoemFlow()
     poem_flow.kickoff()
@@ -38,6 +44,7 @@ def kickoff():
 def plot():
     poem_flow = PoemFlow()
     poem_flow.plot()
+
 
 if __name__ == "__main__":
     kickoff()
