@@ -74,3 +74,5 @@ credentials.json
 htmlcov/
 .pytest_cache/
 .hypothesis/
+
+.ipynb_checkpoints/
