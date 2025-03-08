@@ -73,6 +73,77 @@ Compatibilidad:
    - Ve a Settings > Resources > WSL Integration
    - Habilita la integración con tu distribución de WSL 2
 
+### Instalación de Poetry
+
+Para la gestión de dependencias, utilizamos Poetry. Sigue estos pasos para instalarlo:
+
+#### Para macOS / Linux:
+
+1. Instalación mediante curl:
+
+   ```bash
+   curl -sSL https://install.python-poetry.org | python3 -
+   ```
+
+2. Añade Poetry a tu PATH en tu archivo `.zshrc` o `.bashrc`:
+
+   ```bash
+   export PATH="$HOME/.local/bin:$PATH"
+   ```
+
+3. Reinicia tu terminal o ejecuta `source ~/.zshrc` (o `source ~/.bashrc`).
+
+4. Verifica la instalación:
+   ```bash
+   poetry --version
+   ```
+
+#### Para Windows:
+
+1. Usando PowerShell:
+
+   ```powershell
+   (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | python -
+   ```
+
+2. Añade Poetry a tu PATH:
+   - Busca "Variables de entorno" en el menú Inicio
+   - Selecciona "Editar las variables de entorno del sistema"
+   - Haz clic en "Variables de entorno"
+   - Edita la variable "Path" del usuario
+   - Añade la ruta `%APPDATA%\Python\Scripts`
+   - Haz clic en "Aceptar" para guardar los cambios
+
+3. Verifica la instalación:
+   ```powershell
+   poetry --version
+   ```
+
+### Uso básico de Poetry en el proyecto
+
+1. **Instalar dependencias** (si ya existe un archivo `pyproject.toml`):
+
+   ```bash
+   poetry install
+   ```
+
+2. **Añadir una nueva dependencia**:
+
+   ```bash
+   poetry add nombre-del-paquete
+   ```
+
+3. **Añadir una dependencia solo para desarrollo**:
+
+   ```bash
+   poetry add --dev nombre-del-paquete
+   ```
+
+4. **Actualizar dependencias**:
+   ```bash
+   poetry update
+   ```
+
 ## Estructura del Proyecto
 
 ```
@@ -83,7 +154,8 @@ proyecto/
 ├── Dockerfile              # Configuración para construir la imagen Docker
 ├── docker-compose.yml      # Configuración de servicios
 ├── Makefile                # Comandos para ejecutar diferentes tareas
-├── requirements.txt        # Dependencias de Python
+├── pyproject.toml          # Configuración de Poetry y dependencias
+├── poetry.lock             # Archivo de bloqueo para versiones exactas de dependencias
 └── README.md               # Este archivo
 ```
 
@@ -232,3 +304,23 @@ Si los puertos 8000 u 8888 están ocupados, modifica los puertos en `docker-comp
 ports:
   - "8001:8000" # Cambia 8001 por otro puerto disponible
 ```
+
+### Problemas con Poetry en Docker
+
+Si enfrentas problemas con Poetry dentro de los contenedores:
+
+1. Verifica que el Dockerfile instale Poetry correctamente:
+   ```dockerfile
+   RUN pip install poetry && \
+       poetry config virtualenvs.create false
+   ```
+
+2. Asegúrate de que el archivo `pyproject.toml` esté correctamente copiado al contenedor:
+   ```dockerfile
+   COPY pyproject.toml poetry.lock* /app/
+   ```
+
+3. Si las dependencias no se instalan, ejecuta:
+   ```bash
+   docker-compose exec ai-agent poetry install
+   ```

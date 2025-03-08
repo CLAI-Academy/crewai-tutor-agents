@@ -10,7 +10,7 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
-# Instalar dependencias de sistema
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
     curl \
@@ -22,29 +22,28 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Instalar Poetry dentro del contenedor
+# Install Poetry inside the container
 RUN pip install poetry
 
-# Copiar archivos de Poetry (solo estos primero para cachear mejor)
+# Copy Poetry files (only these first to optimize caching)
 COPY README.md pyproject.toml poetry.lock* ./
-# 5. Copiar el directorio app (lo que define tu paquete) para que Poetry lo “vea”
+# Copy the app directory (what defines your package) so Poetry can "see" it
 COPY app/ app/
-# Configurar Poetry para que NO cree entornos virtuales dentro del contenedor
-# e instalar dependencias
+# Configure Poetry to NOT create virtual environments inside the container
+# and install dependencies
 RUN poetry config virtualenvs.create false && \
     poetry install --with dev --no-interaction --no-ansi
 
-# Copiar el resto de la aplicación
+# Copy the rest of the application
 COPY . .
 
-
-# Crear usuario no-root para seguridad
+# Create non-root user for security
 RUN useradd -m appuser
 RUN chown -R appuser:appuser /app
 USER appuser
 
-# Exponer puertos (para FastAPI o Jupyter)
+# Expose ports (for FastAPI or Jupyter)
 EXPOSE 8000 8888
 
-# Ejecutar la app usando Poetry 
+# Run the app using Poetry
 CMD ["poetry", "run", "python", "-m", "app.main"]
