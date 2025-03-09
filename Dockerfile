@@ -39,7 +39,16 @@ COPY pyproject.toml poetry.lock* ./
 # Install dependencies
 RUN poetry install --no-root --without dev
 
-# Copy application code
+# Copy Poetry files (only these first to optimize caching)
+COPY README.md pyproject.toml poetry.lock* ./
+# Copy the app directory (what defines your package) so Poetry can "see" it
+COPY app/ app/
+# Configure Poetry to NOT create virtual environments inside the container
+# and install dependencies
+RUN poetry config virtualenvs.create false && \
+    poetry install --with dev --no-interaction --no-ansi
+
+# Copy the rest of the application
 COPY . .
 
 # Create non-root user for security
@@ -47,6 +56,8 @@ RUN useradd -m appuser
 RUN chown -R appuser:appuser /app
 USER appuser
 
+# Expose ports (for FastAPI or Jupyter)
 EXPOSE 8000 8888
 
+# Run the app using Poetry
 CMD ["python", "-m", "app.main"]
