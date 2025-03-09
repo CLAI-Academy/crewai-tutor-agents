@@ -11,57 +11,55 @@ from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
 class CryptoDataTool(BaseTool):
-     name: str = "Crypto Data Tool"
-     description: str = "Scrape de datos actuales e históricos de criptomonedas."
+    name: str = "Crypto Data Tool"
+    description: str = "Scrape de datos actuales e históricos de criptomonedas."
+
+    def _run(self) -> dict:
+        # Diccionario de criptomonedas
+        cryptos = {
+            1: "bitcoin",
+            2: "ethereum",
+            3: "crp",
+            4: "bnb",
+            5: "solana",
+            6: "cardano",
+            7: "dogecoin",
+            8: "tron",
+            9: "avalanche",
+            10: "toncoin"
+        }
+        
+        resultados = {}
+        # Se realizan 3 ejecuciones
+        for i in range(1, 3):
+            # Seleccionar una criptomoneda al azar
+            crypto = random.choice(list(cryptos.values()))
+            
+            # Calcular fechas a buscar a partir de la fecha actual
+            fecha_actual = datetime.now()
+            fechas = {
+                "un_dia": (fecha_actual - timedelta(days=1)).strftime("%b %d, %Y"),
+                "tres_dias": (fecha_actual - timedelta(days=3)).strftime("%b %d, %Y"),
+                "una_semana": (fecha_actual - timedelta(days=7)).strftime("%b %d, %Y"),
+                "dos_semanas": (fecha_actual - timedelta(days=14)).strftime("%b %d, %Y"),
+                "un_mes": (fecha_actual - timedelta(days=30)).strftime("%b %d, %Y"),
+                "un_mes_y_medio": (fecha_actual - timedelta(days=45)).strftime("%b %d, %Y")
+            }
+            
+            # Obtener el precio actual
+            datos_actuales = self.scrape_current(crypto)
+            
+            # Obtener los datos históricos en una sola ejecución del webdriver
+            datos_historicos = self.scrape_historic(crypto, fechas)
+            
+            resultados[f"Ejecución {i} - {crypto}"] = {
+                "datos_actuales": datos_actuales,
+                "datos_historicos": datos_historicos
+            }
+        
+        return resultados
  
-     def _run(self) -> dict:
-         # Diccionario de criptomonedas
-         cryptos = {
-             1: "bitcoin",
-             2: "ethereum",
-             3: "crp",
-             4: "bnb",
-             5: "solana",
-             6: "cardano",
-             7: "dogecoin",
-             8: "tron",
-             9: "avalanche",
-             10: "toncoin"
-         }
-         
-         resultados = {}
-         # Se realizan 3 ejecuciones
-         for i in range(1, 3):
-             # Seleccionar una criptomoneda al azar
-             crypto = random.choice(list(cryptos.values()))
-             
-             # Calcular fechas a buscar a partir de la fecha actual
-             fecha_actual = datetime.now()
-             fechas = {
-                 "un_dia": (fecha_actual - timedelta(days=1)).strftime("%b %d, %Y"),
-                 "tres_dias": (fecha_actual - timedelta(days=3)).strftime("%b %d, %Y"),
-                 "una_semana": (fecha_actual - timedelta(days=7)).strftime("%b %d, %Y"),
-                 "dos_semanas": (fecha_actual - timedelta(days=14)).strftime("%b %d, %Y"),
-                 "un_mes": (fecha_actual - timedelta(days=30)).strftime("%b %d, %Y"),
-                 "un_mes_y_medio": (fecha_actual - timedelta(days=45)).strftime("%b %d, %Y")
-             }
-             
-             # Obtener el precio actual
-             datos_actuales = self.scrape_current(crypto)
-             
-             # Obtener los datos históricos para cada fecha
-             datos_historicos = {}
-             for key, fecha in fechas.items():
-                 datos_historicos[key] = self.scrape_historic(crypto, fecha)
-             
-             resultados[f"Ejecución {i} - {crypto}"] = {
-                 "datos_actuales": datos_actuales,
-                 "datos_historicos": datos_historicos
-             }
-         
-         return resultados
- 
-     def scrape_current(self, moneda: str) -> dict:
+    def scrape_current(self, moneda: str) -> dict:
          """
          Scrapea el precio actual de la criptomoneda.
          """
@@ -91,47 +89,41 @@ class CryptoDataTool(BaseTool):
              return {"error": resultado}
          return {"Precio": resultado}
  
-     def scrape_historic(self, moneda: str, fecha: str) -> dict:
-         """
-         Scrapea los datos históricos de la criptomoneda para una fecha dada.
-         """
-         class Scraper:
-             def __init__(self, moneda: str, fecha: str):
-                 self.moneda = moneda
-                 self.fecha = fecha
-                 self.url = f"https://coinmarketcap.com/es/currencies/{self.moneda}/historical-data/"
-                 self.options = webdriver.ChromeOptions()
-                 self.options.add_argument("--headless")
- 
-             def run(self) -> dict:
-                 driver = webdriver.Chrome(
-                     service=Service(ChromeDriverManager().install()),
-                     options=self.options
-                 )
-                 driver.get(self.url)
-                 wait = WebDriverWait(driver, 10)
-                 try:
-                     fila = wait.until(
-                         EC.visibility_of_element_located(
-                             (By.XPATH, f"//tbody/tr[td[normalize-space(text())='{self.fecha}']]")
-                         )
-                     )
-                     columnas = fila.find_elements(By.TAG_NAME, "td")
-                     resultado = {
-                         "Apertura": columnas[1].text,
-                         "Alza": columnas[2].text,
-                         "Baja": columnas[3].text,
-                         "MarketCap": columnas[6].text
-                     }
-                 except Exception as e:
-                     resultado = {"error": str(e)}
-                 driver.quit()
-                 return resultado
- 
-         return Scraper(moneda, fecha).run()
-
-    
-
+    def scrape_historic(self, moneda: str, fechas: dict) -> dict:
+        """
+        Scrapea los datos históricos de la criptomoneda para las fechas dadas en una sola ejecución del webdriver.
+        """
+        resultados = {}
+        url = f"https://coinmarketcap.com/es/currencies/{moneda}/historical-data/"
+        options = webdriver.ChromeOptions()
+        options.add_argument("--headless")
+        
+        driver = webdriver.Chrome(
+            service=Service(ChromeDriverManager().install()),
+            options=options
+        )
+        driver.get(url)
+        wait = WebDriverWait(driver, 10)
+        
+        for key, fecha in fechas.items():
+            try:
+                fila = wait.until(
+                    EC.visibility_of_element_located(
+                        (By.XPATH, f"//tbody/tr[td[normalize-space(text())='{fecha}']]")
+                    )
+                )
+                columnas = fila.find_elements(By.TAG_NAME, "td")
+                resultados[key] = {
+                    "Apertura": columnas[1].text,
+                    "Alza": columnas[2].text,
+                    "Baja": columnas[3].text,
+                    "MarketCap": columnas[6].text
+                }
+            except Exception as e:
+                resultados[key] = {"error": str(e)}
+        
+        driver.quit()
+        return resultados
 
 class ActionsDataTool(BaseTool):
     name: str = "Actions Data Tool"
@@ -173,12 +165,11 @@ class ActionsDataTool(BaseTool):
         return resultados
     
 
-   
 
     def obtener_datos_en_fechas(self, ticker, fechas):
         """
         Obtiene para cada fecha los datos relevantes:
-        apertura, máximo, mínimo, cierre, cierre ajustado, volumen, dividendos y splits.
+        apertura, máximo, mínimo, cierre, cierre ajustado, volumen.
         Si la fecha exacta no se encuentra (por ejemplo, en fin de semana),
         se toma el último registro disponible anterior a esa fecha.
         """
@@ -211,6 +202,7 @@ class ActionsDataTool(BaseTool):
 
         return datos_resultado
 
+# Ejecución para probar las tool
 if __name__ == "__main__":
     tool = CryptoDataTool()
     print(tool._run())
