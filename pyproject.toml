@@ -9,13 +9,11 @@ packages = [
 package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.12"
-crewai = "*"
+python = ">=3.12,<3.13"
+crewai = "^0.102.0"
 crewai-tools = "*"
-pydantic = "^2.10.6"
 fastapi = "^0.115.11"
 uvicorn = "^0.27.0"
-python-dotenv = "^0.21.0"
 loguru = "^0.6.0"
 
 [tool.poetry.group.dev.dependencies]
