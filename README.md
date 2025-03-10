@@ -107,6 +107,7 @@ Para la gestión de dependencias, utilizamos Poetry. Sigue estos pasos para inst
    ```
 
 2. Añade Poetry a tu PATH:
+
    - Busca "Variables de entorno" en el menú Inicio
    - Selecciona "Editar las variables de entorno del sistema"
    - Haz clic en "Variables de entorno"
@@ -310,12 +311,14 @@ ports:
 Si enfrentas problemas con Poetry dentro de los contenedores:
 
 1. Verifica que el Dockerfile instale Poetry correctamente:
+
    ```dockerfile
    RUN pip install poetry && \
        poetry config virtualenvs.create false
    ```
 
 2. Asegúrate de que el archivo `pyproject.toml` esté correctamente copiado al contenedor:
+
    ```dockerfile
    COPY pyproject.toml poetry.lock* /app/
    ```
