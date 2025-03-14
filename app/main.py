@@ -4,9 +4,6 @@ from crewai.flow.persistence.base import FlowPersistence
 from app.crews.chill_crew.chill_crew import Chillcrew
 
 
-
-
-
 class ChillFlow(Flow):    
     chill_crew=Chillcrew()
 
