@@ -1,0 +1,17 @@
+diagnostico_capilar:
+  description:
+    "Analizar detalladamente la imagen del cabello del cliente proporcionada y generar un diagnóstico profesional completo. El análisis debe:
+    - Determinar la altura del tono base utilizando la escala internacional de colorimetría (1-10)
+    - Calcular el porcentaje aproximado de canas presentes
+    - Identificar y describir el color en medios y puntas, especificando si hay decoloración o coloración previa
+    - Proporcionar una descripción técnica del tono actual (cálido, frío, neutro, matices específicos)
+    - Analizar las características generales del cabello (porosidad, grosor, densidad, textura, nivel de daño)
+    - Presentar toda la información en un formato estructurado y profesional"
+  expected_output:
+    "Informe de diagnóstico capilar estructurado que contenga las siguientes secciones claramente identificadas:
+    1. Altura de tono base (valor numérico con descripción)
+    2. Porcentaje de canas (valor porcentual aproximado; 0% 25% 50% 75% 100%)
+    3. Análisis de color en medios y puntas (descripción detallada con terminología técnica)
+    4. Descripción del tono (familia de color, subtono, matices)
+    5. Características y condición del cabello (análisis estructural completo)
+    El informe debe utilizar terminología profesional de colorimetría y estar presentado en un formato claro y conciso. Pero utilizando un lenguaje simple para que un adolecente lo pueda entender."
