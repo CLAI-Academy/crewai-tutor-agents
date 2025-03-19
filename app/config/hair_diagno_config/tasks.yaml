@@ -1,12 +1,7 @@
-diagnostico_capilar:
+hair_diagno_generation:
   description:
-    "Analizar detalladamente la imagen del cabello del cliente proporcionada y generar un diagnóstico profesional completo. El análisis debe:
-    - Determinar la altura del tono base utilizando la escala internacional de colorimetría (1-10)
-    - Calcular el porcentaje aproximado de canas presentes
-    - Identificar y describir el color en medios y puntas, especificando si hay decoloración o coloración previa
-    - Proporcionar una descripción técnica del tono actual (cálido, frío, neutro, matices específicos)
-    - Analizar las características generales del cabello (porosidad, grosor, densidad, textura, nivel de daño)
-    - Presentar toda la información en un formato estructurado y profesional"
+    "Utiliza la herramienta disponible para generar el diagnostico pasandole como parametro {image_path}.
+    Una vez recibido el diagnostico, estructuralo en el formato indicado en el expected_output. y No sugierasningun diagnostico si no puedes leer, encodear o procesar la imagen"
   expected_output:
     "Informe de diagnóstico capilar estructurado que contenga las siguientes secciones claramente identificadas:
     1. Altura de tono base (valor numérico con descripción)
