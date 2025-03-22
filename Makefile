@@ -24,7 +24,7 @@ poetry-export: ## Export dependencies to requirements.txt
 # === Development Commands ===
 
 dev: ## Run the main application
-	python -m app.main
+	python -m app.api.api
 
 jupyter: ## Start Jupyter Notebook without password
 	jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token='' --NotebookApp.password=''
@@ -33,8 +33,9 @@ test: ## Run tests with pytest
 	pytest
 
 lint: ## Format code with black and sort imports with isort
-    poetry run black .
-    poetry run isort .
+	poetry run black .
+	poetry run isort .
+
 
 # === Main Docker Commands ===
 

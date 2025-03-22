@@ -53,7 +53,7 @@ financial_simulator:
     4. Clear explanation of methodology used for analysis
     5. Disclaimers about market volatility and that past performance doesn't guarantee future results
     6. The response must be in spanish and you need to explain all the scenarios and in what invest in each case
-    
+
 financial_optimizer:
   role: "Investment Portfolio Advisor"
   goal: "Analyze investment recommendations and provide structured, actionable investment advice with financial projections"
