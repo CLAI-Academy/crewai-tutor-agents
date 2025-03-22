@@ -1,6 +1,6 @@
 from crewai.tools import BaseTool
+from pydantic import BaseModel, Field
 import yfinance as yf
-from pycoingecko import CoinGeckoAPI
 from datetime import datetime, timedelta
 import random
 from selenium import webdriver
@@ -9,6 +9,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
+import pandas as pd
+import concurrent.futures
+
 
 class CryptoDataTool(BaseTool):
     name: str = "Crypto Data Tool"
@@ -124,22 +127,16 @@ class CryptoDataTool(BaseTool):
         
         driver.quit()
         return resultados
+    
+class ActionsDataToolInput(BaseModel):
+    ticker: str = Field(..., description="Ticker de la acción a analizar")
 
 class ActionsDataTool(BaseTool):
     name: str = "Actions Data Tool"
     description: str = "Scrape de datos actuales e históricos de acciones."
+    args_schema = ActionsDataToolInput
 
     def _run(self) -> dict:
-        actions = {
-            1: "NVDA", #nvidia
-            2: "AAPL",  #apple
-            3: "NEE", # nextera energy
-            4: "REP.MC", # Repsol
-            6: "AMZN", # amazon
-            7: "NFLX", # netflix
-            8: "nke", # nike
-            9: "MSFT" # microsoft
-        }
         
         resultados = {}
         today = datetime.today()
@@ -154,7 +151,7 @@ class ActionsDataTool(BaseTool):
         }
 
         for i in range(1, 3):
-            ticker = random.choice(list(actions.values()))
+            ticker = self.input.ticker
             print(ticker)
             datos_historicos = self.obtener_datos_en_fechas(ticker, fechas)
             
@@ -202,7 +199,191 @@ class ActionsDataTool(BaseTool):
 
         return datos_resultado
 
+class TickerFinderToolInput(BaseModel):
+    """Esquema de entrada para la herramienta Ticker Finder Tool."""
+    risk: str = Field(..., description="Nivel de riesgo a asumir: low/medium/high")
+
+class TickerFinderTool(BaseTool):
+    name: str = "Ticker Finder Tool"
+    description: str = "Filtra tickers basados en datos financieros y nivel de riesgo."
+    args_schema = TickerFinderToolInput
+
+    def __init__(self, risk: str):
+        """
+        Inicializa la herramienta configurando los parámetros de filtrado según el riesgo.
+        
+        Paso 1: Se determinan los valores de:
+          - min_dividend_yield: rendimiento mínimo por dividendos.
+          - max_pe: máximo ratio P/E permitido.
+          - usar_media_50: indica si se compara el precio actual con la media de 50 días.
+        """
+        risk_lower = risk.lower()
+        if risk_lower in ["low", "bajo"]:
+            self.min_dividend_yield = 4.0  # Más restrictivo para riesgo bajo
+            self.max_pe = 15.0
+            self.usar_media_50 = True
+        elif risk_lower in ["medium", "medio"]:
+            self.min_dividend_yield = 3.0
+            self.max_pe = 20.0
+            self.usar_media_50 = True
+        elif risk_lower in ["high", "alto"]:
+            self.min_dividend_yield = 1.5  # Más permisivo para riesgo alto
+            self.max_pe = 30.0
+            self.usar_media_50 = False
+        else:
+            self.min_dividend_yield = 3.0
+            self.max_pe = 20.0
+            self.usar_media_50 = True
+
+    def _run(self) -> dict:
+        """
+        Método principal:
+        
+        Paso 1: Extrae la lista de tickers desde Wikipedia.
+        Paso 2: Pasa la lista a un método que los procesa y filtra.
+        Paso 3: Devuelve 3 tickers aleatorios de entre los resultados que cumplan los criterios.
+        """
+        # Paso 1: Obtener los tickers del S&P 500.
+        tickers = self.obtener_tickers_sp500()
+        
+        # Paso 2: Procesar la lista de tickers para aplicar los filtros definidos.
+        resultados = self.procesar_tickers(tickers, debug=True)
+        
+        # Paso 3: Seleccionar 3 tickers aleatorios (si hay más de 3 resultados)
+        if len(resultados) > 3:
+            resultados = random.sample(resultados, 3)
+        
+        return {"results": resultados}
+
+    def obtener_tickers_sp500(self):
+        """
+        Extrae la lista de tickers del S&P 500 desde Wikipedia.
+        
+        Retorna:
+          Una lista de símbolos bursátiles.
+        """
+        url = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
+        try:
+            df = pd.read_html(url, header=0)[0]
+            tickers = df['Symbol'].tolist()
+            return tickers
+        except Exception as e:
+            print(f"Error al obtener tickers del S&P 500: {e}")
+            return []
+
+    def procesar_tickers(self, tickers, debug=False, max_workers=5):
+        """
+        Procesa la lista de tickers de forma concurrente y aplica los filtros.
+        
+        Paso 1: Se envían tareas concurrentes para procesar cada ticker.
+        Paso 2: Se recogen los resultados a medida que cada tarea finaliza.
+        
+        Retorna:
+          Una lista de diccionarios con la información de cada ticker que cumple los criterios.
+        """
+        resultados = []
+        try:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+                # Se envía una tarea por cada ticker usando el método procesar_ticker.
+                # El diccionario 'futures' mapea cada tarea (future) con el ticker correspondiente.
+                futures = {
+                    executor.submit(self.procesar_ticker, ticker, debug): ticker 
+                    for ticker in tickers
+                }
+                # Se itera sobre las tareas a medida que van finalizando.
+                for future in concurrent.futures.as_completed(futures):
+                    try:
+                        res = future.result()
+                    except TickerFinderTool.RateLimitedException as rle:
+                        print("Rate limited detectado. Se detiene la búsqueda.")
+                        break
+                    except Exception as e:
+                        if debug:
+                            print(f"Error en ticker {futures[future]}: {e}")
+                        continue
+                    if res:
+                        resultados.append(res)
+        except Exception as e:
+            if debug:
+                print(f"Error en el procesamiento concurrente: {e}")
+        return resultados
+
+    def procesar_ticker(self, ticker, debug=False):
+        """
+        Procesa un ticker utilizando yfinance y aplica los filtros basados en:
+          - Comparación del precio actual con la media de 50 días (si aplica).
+          - Rendimiento mínimo por dividendos.
+          - Ratio P/E máximo permitido.
+        
+        Retorna:
+          Un diccionario con los datos del ticker si cumple los criterios, o None en caso contrario.
+        """
+        try:
+            stock = yf.Ticker(ticker)
+            info = stock.info
+
+            precio_actual = info.get('regularMarketPrice')
+            media_50 = info.get('fiftyDayAverage')
+            dividend_yield = info.get('dividendYield')
+            pe_ratio = info.get('trailingPE')
+            dividend_yield_pct = dividend_yield * 100 if dividend_yield is not None else 0.0
+
+            if debug:
+                print(f"Ticker: {ticker}")
+                print(f"  Precio actual: {precio_actual}")
+                print(f"  Media 50 días: {media_50}")
+                print(f"  Dividend Yield (%): {dividend_yield_pct}")
+                print(f"  P/E Ratio: {pe_ratio}")
+
+            cumple = True
+
+            # Se aplica el filtro de precio en relación con la media de 50 días si es requerido.
+            if self.usar_media_50:
+                if precio_actual is not None and media_50 is not None:
+                    if precio_actual >= media_50:
+                        cumple = False
+                        if debug:
+                            print("  Falla: Precio actual no está por debajo de la media de 50 días.")
+                else:
+                    cumple = False
+                    if debug:
+                        print("  Falla: Datos insuficientes para comparar precio y media de 50 días.")
+
+            # Se aplica el filtro del rendimiento por dividendos.
+            if dividend_yield_pct < self.min_dividend_yield:
+                cumple = False
+                if debug:
+                    print(f"  Falla: Dividend yield {dividend_yield_pct}% es menor que el mínimo requerido {self.min_dividend_yield}%.")
+
+            # Se aplica el filtro del ratio P/E.
+            if pe_ratio is None or pe_ratio > self.max_pe:
+                cumple = False
+                if debug:
+                    print(f"  Falla: P/E Ratio {pe_ratio} no cumple el máximo permitido {self.max_pe}.")
+
+            if cumple:
+                if debug:
+                    print("  Cumple todos los criterios.")
+                return {
+                    "ticker": ticker,
+                    "precio_actual": precio_actual,
+                    "media_50": media_50,
+                    "dividend_yield_pct": dividend_yield_pct,
+                    "pe_ratio": pe_ratio
+                }
+        except Exception as e:
+            if "Too Many Requests" in str(e) or "Rate limited" in str(e):
+                raise TickerFinderTool.RateLimitedException(str(e))
+            if debug:
+                print(f"Error procesando {ticker}: {e}")
+        return None
+
+    class RateLimitedException(Exception):
+        """Excepción para indicar que se ha excedido el límite de peticiones."""
+        pass
+
+
 # Ejecución para probar las tool
 if __name__ == "__main__":
-    tool = CryptoDataTool()
+    tool = TickerFinderTool(risk="low")
     print(tool._run())

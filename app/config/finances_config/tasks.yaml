@@ -7,15 +7,19 @@ analize_cashflow:
   expected_output: >
     Returns the avaible quantity to invest from the user's cashflow
 
-generate_investment_scenarios:
+find_tickers:
   description: >
-    Generate investment scenarios based on the following text, you can generate a scenario with high volatility or low volatility, the amount of money to invest and the time to invest is the same for
-    all the scenarios, if the user wants risk, you can generate a scenario with high volatility(crypto with high volatility), if the user wants to be more conservative, 
-    you can generate a scenario with low volatility(actions with low volatility):
-    Extract the risk and the quantity of money to invest from the following text:
+    Find the tickers of the 3 best companies to invest in based on the risk level and the investment amount. You will extract the risk level and the investment amount from the following text:
     <text>
     {prompt}
     </text>
+  expected_output: >
+    A list of 3 tickers of the best companies to invest in based on the risk level and the investment amount.
+
+generate_investment_scenarios:
+  description: >
+    Generate investment scenarios, you need to pass the tickers of the companies to invest in, the risk level and the investment amount. If the user wants more risk, you can 
+    use crypto, if the user wants to be more conservative, you can use actions. 
   expected_output: >
     Returns the investment scenarios with the following format:
     <example>

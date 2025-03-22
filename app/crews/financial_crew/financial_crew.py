@@ -1,5 +1,5 @@
 from crewai import Agent, Crew, Task, LLM, Process
-from app.tools.financial_crew.tool import CryptoDataTool, ActionsDataTool
+from app.tools.financial_crew.tool import CryptoDataTool, ActionsDataTool, TickerFinderTool
 import yaml
 
 files = {
@@ -26,6 +26,12 @@ financial_evaluator = Agent(
   llm=llm
 )
 
+ticker_finder = Agent(
+  config=agents_config['ticker_finder'],
+  tools=[TickerFinderTool()],
+  llm=llm
+)
+
 financial_simulator = Agent(
   config=agents_config['financial_simulator'],
   tools=[CryptoDataTool(), ActionsDataTool()],
@@ -42,6 +48,11 @@ analize_cashflow = Task(
   agent=financial_evaluator,
 )
 
+find_tickers = Task(
+  config=tasks_config['find_tickers'],
+  agent=ticker_finder,
+)
+
 generate_investment_scenarios = Task(
   config=tasks_config['generate_investment_scenarios'],
   agent=financial_simulator,
@@ -55,11 +66,13 @@ optimizated_investment_scenarios = Task(
 crew = Crew(
   agents=[
     financial_evaluator,
+    ticker_finder,
     financial_simulator,
     financial_optimizer
   ],
   tasks=[
     analize_cashflow,
+    find_tickers,
     generate_investment_scenarios,
     optimizated_investment_scenarios
   ],
