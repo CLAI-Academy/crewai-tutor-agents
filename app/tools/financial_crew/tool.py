@@ -10,6 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 import pandas as pd
+import time
 import concurrent.futures
 
 
@@ -136,30 +137,20 @@ class ActionsDataTool(BaseTool):
     description: str = "Scrape de datos actuales e históricos de acciones."
     args_schema = ActionsDataToolInput
 
-    def _run(self) -> dict:
-        
-        resultados = {}
+    def _run(self, ticker: str) -> dict:
         today = datetime.today()
         fechas = {
             "1_dia": today - timedelta(days=1),
             "1_semana": today - timedelta(weeks=1),
-            "1_mes": today - timedelta(days=30),      # Aproximación de 1 mes
-            "3_meses": today - timedelta(days=90),      # Aproximación de 3 meses
-            "6_meses": today - timedelta(days=180),     # Aproximación de 6 meses
+            "1_mes": today - timedelta(days=30),    
+            "3_meses": today - timedelta(days=90),    
+            "6_meses": today - timedelta(days=180),   
             "1_año": today - timedelta(days=365),
             "2_años": today - timedelta(days=730)
         }
-
-        for i in range(1, 3):
-            ticker = self.input.ticker
-            print(ticker)
-            datos_historicos = self.obtener_datos_en_fechas(ticker, fechas)
-            
-            resultados[f"Ejecución {i} - {ticker}"] = {
-                "datos_historicos": datos_historicos
-            }
         
-        return resultados
+        datos_historicos = self.obtener_datos_en_fechas(ticker, fechas)
+        return datos_historicos
     
 
 
@@ -186,7 +177,7 @@ class ActionsDataTool(BaseTool):
             except KeyError:
                 # Si no existe, se toma el último registro disponible anterior a la fecha
                 fila = datos.loc[:fecha_str].iloc[-1]
-            
+          
             # Se extraen los datos relevantes y se guardan en un diccionario
             datos_resultado[label] = {
                 "Open": float(fila.get("Open", 0) or 0),
@@ -208,15 +199,29 @@ class TickerFinderTool(BaseTool):
     description: str = "Filtra tickers basados en datos financieros y nivel de riesgo."
     args_schema = TickerFinderToolInput
 
-    def __init__(self, risk: str):
-        """
-        Inicializa la herramienta configurando los parámetros de filtrado según el riesgo.
+    min_dividend_yield: float = 3.0
+    max_pe: float = 20.0
+    usar_media_50: bool = True
+
+    def __init__(self):
+        """Inicializa la herramienta con valores predeterminados."""
+        # Primero inicializamos los atributos obligatorios
+
         
-        Paso 1: Se determinan los valores de:
-          - min_dividend_yield: rendimiento mínimo por dividendos.
-          - max_pe: máximo ratio P/E permitido.
-          - usar_media_50: indica si se compara el precio actual con la media de 50 días.
+        # Después llamamos al constructor de la clase padre
+        super().__init__()
+    
+
+    def _run(self, risk: str) -> dict:
         """
+        Método principal que recibe el nivel de riesgo y ejecuta la búsqueda.
+        
+        Paso 0: Configura los parámetros basados en el riesgo.
+        Paso 1: Extrae la lista de tickers desde Wikipedia.
+        Paso 2: Pasa la lista a un método que los procesa y filtra.
+        Paso 3: Devuelve 3 tickers aleatorios de entre los resultados que cumplan los criterios.
+        """
+        # Paso 0: Configurar los parámetros según el nivel de riesgo
         risk_lower = risk.lower()
         if risk_lower in ["low", "bajo"]:
             self.min_dividend_yield = 4.0  # Más restrictivo para riesgo bajo
@@ -234,15 +239,7 @@ class TickerFinderTool(BaseTool):
             self.min_dividend_yield = 3.0
             self.max_pe = 20.0
             self.usar_media_50 = True
-
-    def _run(self) -> dict:
-        """
-        Método principal:
         
-        Paso 1: Extrae la lista de tickers desde Wikipedia.
-        Paso 2: Pasa la lista a un método que los procesa y filtra.
-        Paso 3: Devuelve 3 tickers aleatorios de entre los resultados que cumplan los criterios.
-        """
         # Paso 1: Obtener los tickers del S&P 500.
         tickers = self.obtener_tickers_sp500()
         

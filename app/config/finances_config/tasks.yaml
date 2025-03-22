@@ -18,8 +18,7 @@ find_tickers:
 
 generate_investment_scenarios:
   description: >
-    Generate investment scenarios, you need to pass the tickers of the companies to invest in, the risk level and the investment amount. If the user wants more risk, you can 
-    use crypto, if the user wants to be more conservative, you can use actions. 
+    Generate investment scenarios, you need to pass the tickers to ActionsDataTool
   expected_output: >
     Returns the investment scenarios with the following format:
     <example>
