@@ -10,9 +10,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 import pandas as pd
-import time
-import concurrent.futures
-
+import os
+import requests
+from typing import List, Dict, Any
 
 class CryptoDataTool(BaseTool):
     name: str = "Crypto Data Tool"
@@ -23,7 +23,6 @@ class CryptoDataTool(BaseTool):
         cryptos = {
             1: "bitcoin",
             2: "ethereum",
-            3: "crp",
             4: "bnb",
             5: "solana",
             6: "cardano",
@@ -192,192 +191,102 @@ class ActionsDataTool(BaseTool):
 
 class TickerFinderToolInput(BaseModel):
     """Esquema de entrada para la herramienta Ticker Finder Tool."""
-    risk: str = Field(..., description="Nivel de riesgo a asumir: low/medium/high")
+    risk: str = Field(..., description="Nivel de riesgo a asumir: very_high/high/medium/low")
 
 class TickerFinderTool(BaseTool):
     name: str = "Ticker Finder Tool"
-    description: str = "Filtra tickers basados en datos financieros y nivel de riesgo."
+    description: str = "Filtra tickers basados en nivel de riesgo desde un archivo CSV."
     args_schema = TickerFinderToolInput
 
-    min_dividend_yield: float = 3.0
-    max_pe: float = 20.0
-    usar_media_50: bool = True
+    csv_url: str = "https://storage.googleapis.com/bucket-tickers-madrid/ticker_results.csv"
+    csv_filename: str = "ticker_results.csv"
 
     def __init__(self):
         """Inicializa la herramienta con valores predeterminados."""
-        # Primero inicializamos los atributos obligatorios
-
-        
-        # Después llamamos al constructor de la clase padre
         super().__init__()
-    
 
     def _run(self, risk: str) -> dict:
         """
         Método principal que recibe el nivel de riesgo y ejecuta la búsqueda.
         
-        Paso 0: Configura los parámetros basados en el riesgo.
-        Paso 1: Extrae la lista de tickers desde Wikipedia.
-        Paso 2: Pasa la lista a un método que los procesa y filtra.
+        Paso 1: Descarga el archivo CSV con los tickers y sus datos.
+        Paso 2: Filtra los tickers según el nivel de riesgo.
         Paso 3: Devuelve 3 tickers aleatorios de entre los resultados que cumplan los criterios.
         """
-        # Paso 0: Configurar los parámetros según el nivel de riesgo
-        risk_lower = risk.lower()
-        if risk_lower in ["low", "bajo"]:
-            self.min_dividend_yield = 4.0  # Más restrictivo para riesgo bajo
-            self.max_pe = 15.0
-            self.usar_media_50 = True
-        elif risk_lower in ["medium", "medio"]:
-            self.min_dividend_yield = 3.0
-            self.max_pe = 20.0
-            self.usar_media_50 = True
-        elif risk_lower in ["high", "alto"]:
-            self.min_dividend_yield = 1.5  # Más permisivo para riesgo alto
-            self.max_pe = 30.0
-            self.usar_media_50 = False
-        else:
-            self.min_dividend_yield = 3.0
-            self.max_pe = 20.0
-            self.usar_media_50 = True
-        
-        # Paso 1: Obtener los tickers del S&P 500.
-        tickers = self.obtener_tickers_sp500()
-        
-        # Paso 2: Procesar la lista de tickers para aplicar los filtros definidos.
-        resultados = self.procesar_tickers(tickers, debug=True)
-        
-        # Paso 3: Seleccionar 3 tickers aleatorios (si hay más de 3 resultados)
-        if len(resultados) > 3:
-            resultados = random.sample(resultados, 3)
-        
-        return {"results": resultados}
-
-    def obtener_tickers_sp500(self):
-        """
-        Extrae la lista de tickers del S&P 500 desde Wikipedia.
-        
-        Retorna:
-          Una lista de símbolos bursátiles.
-        """
-        url = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
         try:
-            df = pd.read_html(url, header=0)[0]
-            tickers = df['Symbol'].tolist()
-            return tickers
+            # Paso 1: Descargar el CSV con los tickers y sus datos
+            self.descargar_csv()
+            
+            # Paso 2: Filtrar los tickers según el nivel de riesgo
+            resultados = self.filtrar_tickers_por_riesgo(risk.lower())
+            
+            # Paso 3: Seleccionar 3 tickers aleatorios (si hay más de 3 resultados)
+            if len(resultados) > 3:
+                resultados = random.sample(resultados, 3)
+            
+            # Paso 4: Eliminar el archivo CSV descargado
+            self.eliminar_csv()
+            
+            return {"results": resultados}
         except Exception as e:
-            print(f"Error al obtener tickers del S&P 500: {e}")
-            return []
+            # En caso de error, asegurarse de eliminar el CSV si existe
+            self.eliminar_csv()
+            raise e
 
-    def procesar_tickers(self, tickers, debug=False, max_workers=5):
+    def descargar_csv(self) -> None:
         """
-        Procesa la lista de tickers de forma concurrente y aplica los filtros.
-        
-        Paso 1: Se envían tareas concurrentes para procesar cada ticker.
-        Paso 2: Se recogen los resultados a medida que cada tarea finaliza.
+        Descarga el archivo CSV con los tickers y sus datos.
+        """
+        try:
+            response = requests.get(self.csv_url)
+            response.raise_for_status()
+            
+            with open(self.csv_filename, 'wb') as f:
+                f.write(response.content)
+        except Exception as e:
+            print(f"Error al descargar el CSV: {e}")
+            raise e
+
+    def eliminar_csv(self) -> None:
+        """
+        Elimina el archivo CSV descargado.
+        """
+        try:
+            if os.path.exists(self.csv_filename):
+                os.remove(self.csv_filename)
+        except Exception as e:
+            print(f"Error al eliminar el CSV: {e}")
+
+    def filtrar_tickers_por_riesgo(self, risk: str) -> List[Dict[str, Any]]:
+        """
+        Filtra los tickers del CSV según el nivel de riesgo especificado.
         
         Retorna:
-          Una lista de diccionarios con la información de cada ticker que cumple los criterios.
+          Una lista de diccionarios con la información de cada ticker que cumple el criterio de riesgo.
         """
         resultados = []
         try:
-            with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-                # Se envía una tarea por cada ticker usando el método procesar_ticker.
-                # El diccionario 'futures' mapea cada tarea (future) con el ticker correspondiente.
-                futures = {
-                    executor.submit(self.procesar_ticker, ticker, debug): ticker 
-                    for ticker in tickers
-                }
-                # Se itera sobre las tareas a medida que van finalizando.
-                for future in concurrent.futures.as_completed(futures):
-                    try:
-                        res = future.result()
-                    except TickerFinderTool.RateLimitedException as rle:
-                        print("Rate limited detectado. Se detiene la búsqueda.")
-                        break
-                    except Exception as e:
-                        if debug:
-                            print(f"Error en ticker {futures[future]}: {e}")
-                        continue
-                    if res:
-                        resultados.append(res)
+            # Leer el CSV descargado
+            df = pd.read_csv(self.csv_filename)
+            
+            # Filtrar por el nivel de riesgo
+            df_filtrado = df[df['risk'] == risk]
+            
+            # Convertir a lista de diccionarios
+            for _, row in df_filtrado.iterrows():
+                resultados.append({
+                    "ticker": row.get('ticker'),
+                    "precio_actual": row.get('precio_actual'),
+                    "media_50": row.get('media_50'),
+                    "dividend_yield_pct": row.get('dividend_yield_pct'),
+                    "pe_ratio": row.get('pe_ratio'),
+                    "risk": row.get("risk")
+                })
         except Exception as e:
-            if debug:
-                print(f"Error en el procesamiento concurrente: {e}")
-        return resultados
-
-    def procesar_ticker(self, ticker, debug=False):
-        """
-        Procesa un ticker utilizando yfinance y aplica los filtros basados en:
-          - Comparación del precio actual con la media de 50 días (si aplica).
-          - Rendimiento mínimo por dividendos.
-          - Ratio P/E máximo permitido.
+            print(f"Error al filtrar tickers por riesgo: {e}")
+            raise e
         
-        Retorna:
-          Un diccionario con los datos del ticker si cumple los criterios, o None en caso contrario.
-        """
-        try:
-            stock = yf.Ticker(ticker)
-            info = stock.info
-
-            precio_actual = info.get('regularMarketPrice')
-            media_50 = info.get('fiftyDayAverage')
-            dividend_yield = info.get('dividendYield')
-            pe_ratio = info.get('trailingPE')
-            dividend_yield_pct = dividend_yield * 100 if dividend_yield is not None else 0.0
-
-            if debug:
-                print(f"Ticker: {ticker}")
-                print(f"  Precio actual: {precio_actual}")
-                print(f"  Media 50 días: {media_50}")
-                print(f"  Dividend Yield (%): {dividend_yield_pct}")
-                print(f"  P/E Ratio: {pe_ratio}")
-
-            cumple = True
-
-            # Se aplica el filtro de precio en relación con la media de 50 días si es requerido.
-            if self.usar_media_50:
-                if precio_actual is not None and media_50 is not None:
-                    if precio_actual >= media_50:
-                        cumple = False
-                        if debug:
-                            print("  Falla: Precio actual no está por debajo de la media de 50 días.")
-                else:
-                    cumple = False
-                    if debug:
-                        print("  Falla: Datos insuficientes para comparar precio y media de 50 días.")
-
-            # Se aplica el filtro del rendimiento por dividendos.
-            if dividend_yield_pct < self.min_dividend_yield:
-                cumple = False
-                if debug:
-                    print(f"  Falla: Dividend yield {dividend_yield_pct}% es menor que el mínimo requerido {self.min_dividend_yield}%.")
-
-            # Se aplica el filtro del ratio P/E.
-            if pe_ratio is None or pe_ratio > self.max_pe:
-                cumple = False
-                if debug:
-                    print(f"  Falla: P/E Ratio {pe_ratio} no cumple el máximo permitido {self.max_pe}.")
-
-            if cumple:
-                if debug:
-                    print("  Cumple todos los criterios.")
-                return {
-                    "ticker": ticker,
-                    "precio_actual": precio_actual,
-                    "media_50": media_50,
-                    "dividend_yield_pct": dividend_yield_pct,
-                    "pe_ratio": pe_ratio
-                }
-        except Exception as e:
-            if "Too Many Requests" in str(e) or "Rate limited" in str(e):
-                raise TickerFinderTool.RateLimitedException(str(e))
-            if debug:
-                print(f"Error procesando {ticker}: {e}")
-        return None
-
-    class RateLimitedException(Exception):
-        """Excepción para indicar que se ha excedido el límite de peticiones."""
-        pass
+        return resultados
 
 
 # Ejecución para probar las tool

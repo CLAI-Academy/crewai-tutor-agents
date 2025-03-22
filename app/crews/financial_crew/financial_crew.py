@@ -81,4 +81,4 @@ crew = Crew(
 )
 
 if __name__ == "__main__":
-    crew.kickoff(inputs={"prompt": "Cobro 200 euros al mes, y quiero invertir 2500 euros en 2 años, que me recomiendas?"})
+    crew.kickoff(inputs={"prompt": "Cobro 5000 euros al mes, puedo invertir 1000 euros al mes, estoy harto que mi dinero solo pierda valor, quiero ganar dinero como sea, quiero riesgo!"})

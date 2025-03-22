@@ -15,8 +15,6 @@ crewai-tools = "*"
 fastapi = "^0.115.11"
 uvicorn = "^0.27.0"
 loguru = "^0.6.0"
-yfinance = "^0.2.54"
-pydantic = "^2.10.6"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.0.0"

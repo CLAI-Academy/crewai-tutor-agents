@@ -76,3 +76,34 @@ financial_optimizer:
     4. Monthly cash flow projection table showing potential growth over 12 months
     5. Concluding remarks with key considerations for the investor
     6. The response must be in spanish and you need to explain all the scenarios and in what invest in each case
+    7. URLs to check values of each invest, for the tickers, you can put https://finance.yahoo.com/quote/(name of the ticker)/ and for cryptos https://coinmarketcap.com/es/currencies/(name of crypto)/
+    Here you have an example of the output you need to do
+    <example>
+    # 🧾 Informe de Escenarios de Inversión Optimizada
+
+    Este informe presenta **cuatro escenarios de inversión**, cada uno con un nivel de riesgo distinto y una estimación de rentabilidad al cabo de **1 año**, utilizando una inversión inicial de **1000 euros** en cada caso.
+
+    El objetivo es mostrar posibles caminos para alcanzar una meta de **2500 euros en un plazo de 24 meses**, combinando diferentes tipos de inversiones.
+
+    ---
+
+    ## 📊 Comparativa de Escenarios
+
+    | Escenario | Nivel de Riesgo | Monto a Invertir | Plazo | Rentabilidad Estimada | Dividendos Estimados | Rentabilidad Total (%) | Monto Final Estimado | Tipo de Inversión | Nombre del Activo                     | Ingreso Mensual Estimado | Enlace de Referencia |
+    |-----------|------------------|------------------|--------|------------------------|-----------------------|-------------------------|------------------------|-------------------|--------------------------------------|---------------------------|------------------------|
+    | 1         | Alto             | 1000 €           | 1 año  | 20%                    | N/A                   | 20%                     | 1200 €                 | Criptomoneda      | Dogecoin                             | 100 €                     | [Dogecoin](https://coinmarketcap.com/es/currencies/dogecoin/) |
+    | 2         | Medio            | 1000 €           | 1 año  | 10%                    | 2%                    | 12%                     | 1120 €                 | Acción            | Morgan Stanley (MS)                  | 100 €                     | [MS](https://finance.yahoo.com/quote/MS/) |
+    | 3         | Medio            | 1000 €           | 1 año  | 8%                     | 1.5%                  | 9.5%                    | 1095 €                 | Acción            | Merck & Co. (MRK)                    | 100 €                     | [MRK](https://finance.yahoo.com/quote/MRK/) |
+    | 4         | Medio            | 1000 €           | 1 año  | 9%                     | 1.75%                 | 10.75%                  | 1107,5 €               | Acción            | PNC Financial Services Group (PNC)   | 100 €                     | [PNC](https://finance.yahoo.com/quote/PNC/) |
+
+    ---
+
+    ## 📌 Resumen General
+
+    Los escenarios presentados muestran distintas opciones de inversión utilizando una base de 1000 euros durante 12 meses. La elección de cada escenario depende del nivel de riesgo que estés dispuesto a asumir:
+
+    - **Escenario 1**: Alta rentabilidad estimada (20%), pero también alto riesgo, ya que se trata de una criptomoneda (Dogecoin).
+    - **Escenarios 2, 3 y 4**: Alternativas con riesgo medio y rendimientos más moderados. Están basadas en acciones de empresas reconocidas, con retornos que combinan crecimiento del valor y dividendos.
+
+    Estas opciones permiten **diversificar** tu cartera de inversión, algo útil para **reducir el riesgo general** y **aumentar el potencial de retorno**. Aunque cada escenario cubre solo un año, podrías reinvertir los resultados en el segundo año para acercarte al objetivo de 2500 euros en total.
+    </example>
