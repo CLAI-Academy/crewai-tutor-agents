@@ -28,7 +28,7 @@ async def conversation(input_data: MessageInput = Body(...)):
     
     # Procesar la conversación
     response = await flow.kickoff_async()
-    
+    print(flow.state)
     # Devolver directamente la respuesta
     return {"response": response}
 

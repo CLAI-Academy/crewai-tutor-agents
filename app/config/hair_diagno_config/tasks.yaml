@@ -1,0 +1,12 @@
+hair_diagno_generation:
+  description:
+    "Utiliza la herramienta disponible para generar el diagnostico pasandole como parametro {image_path}.
+    Una vez recibido el diagnostico, estructuralo en el formato indicado en el expected_output. y No sugierasningun diagnostico si no puedes leer, encodear o procesar la imagen"
+  expected_output:
+    "Informe de diagnóstico capilar estructurado que contenga las siguientes secciones claramente identificadas:
+    1. Altura de tono base (valor numérico con descripción)
+    2. Porcentaje de canas (valor porcentual aproximado; 0% 25% 50% 75% 100%)
+    3. Análisis de color en medios y puntas (descripción detallada con terminología técnica)
+    4. Descripción del tono (familia de color, subtono, matices)
+    5. Características y condición del cabello (análisis estructural completo)
+    El informe debe utilizar terminología profesional de colorimetría y estar presentado en un formato claro y conciso. Pero utilizando un lenguaje simple para que un adolecente lo pueda entender."
