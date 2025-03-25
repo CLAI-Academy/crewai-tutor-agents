@@ -5889,4 +5889,9 @@ type = ["pytest-mypy"]
 
 [metadata]
 lock-version = "2.1"
+<<<<<<<<< Temporary merge branch 1
 python-versions = ">=3.12,<3.13"
+content-hash = "fc08bc6c48171492e13d872307a72486e3aa984c74dd82c72e11c75e19636691"
+=========
+python-versions = ">=3.12,<3.13"
+>>>>>>>>> Temporary merge branch 2
