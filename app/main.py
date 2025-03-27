@@ -1,11 +1,10 @@
 from typing import Any
 from crewai.flow.flow import Flow, listen, start, router
 from pydantic import BaseModel
-from crewai.flow.persistence.base import FlowPersistence
 from app.crews.chill_crew.chill_crew import Chillcrew
 from app.crews.financial_crew.financial_crew import FinanceCrew
 import openai
-
+import sys 
 
 class ExampleState(BaseModel):
     categorias: str = ""
@@ -14,8 +13,8 @@ class RouterFlow(Flow[ExampleState]):
     
     @start()
     def start_method(self):
-        self.financialflow = FinanceFlow()  # Instancia para el flujo financiero
-        self.chillflow = ChillFlow()   
+        self.financialflow = FinanceCrew()  
+        self.chillflow = Chillcrew()   
         print("Starting the structured flow")
         client = openai.Client()
         respuesta = client.chat.completions.create(
@@ -41,37 +40,29 @@ class RouterFlow(Flow[ExampleState]):
     @listen("peluqueria")
     def peluqueria(self):
         print("Crew peluqueria")
+        self.finish_flow() 
 
     @listen("finanzas")
     def finanzas(self):
-        self.financialflow.state['user_input'] = mensaje
-        self.financialflow.kickoff()
+        result = self.financialflow.crew().kickoff(inputs={'prompt': mensaje})
+        print(result)
+        self.finish_flow()
+        return result
 
     @listen("chill")
     def chill(self):
-        self.chillflow.state['user_input'] = mensaje
-        self.chillflow.kickoff()
-
-
-class FinanceFlow(Flow):
-    finance_crew=FinanceCrew()
-
-    @start()
-    def empezar_conversacion(self):
-        result=self.finance_crew.crew().kickoff(inputs={'prompt': self.state['user_input']})
+        result = self.chillflow.crew().kickoff(inputs={'message': mensaje})
+        print(result)
+        self.finish_flow() 
         return result
-    
-class ChillFlow(Flow):    
-    chill_crew=Chillcrew()
 
-    @start()
-    def empezar_conversacion(self):
-        result=self.chill_crew.crew().kickoff(inputs={'message': self.state['user_input']})
-        return result
+    def finish_flow(self):
+        print("Terminando el flow.")
+        sys.exit()  # Detiene la ejecución del script
         
 
 if __name__ == "__main__":
     # Crea una instancia del flow
-    mensaje = "Cobro 5000 euros al mes, puedo invertir 1000 euros al mes, estoy harto que mi dinero solo pierda valor, quiero ganar dinero como sea, quiero riesgo!"
+    mensaje = "Cobro 5000 euros al mes, puedo invertir 1000 euros al mes, estoy harto de que mi dinero solo pierda valor, ¡quiero ganar dinero como sea, quiero riesgo!"
     flow = RouterFlow()
     flow.kickoff()
