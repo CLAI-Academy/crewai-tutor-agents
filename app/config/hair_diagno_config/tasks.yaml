@@ -1,7 +1,12 @@
 hair_diagno_generation:
   description:
-    "Utiliza la herramienta disponible para generar el diagnostico pasandole como parametro {image_path}.
-    Una vez recibido el diagnostico, estructuralo en el formato indicado en el expected_output. y No sugierasningun diagnostico si no puedes leer, encodear o procesar la imagen"
+    "1. PRIMERO: Utiliza la herramienta analyze_image para generar el diagnóstico pasándole como parámetro {image_path}.
+
+    2. SEGUNDO: Una vez obtenido el diagnóstico, utiliza la herramienta upload_to_cloudflare para subir la imagen a Cloudflare R2, pasándole como parámetro {image_path}.
+
+    3. TERCERO: Estructura el diagnóstico en el formato indicado en el expected_output, e incluye la URL pública retornada por la herramienta de upload.
+
+    Es OBLIGATORIO que uses AMBAS herramientas en este orden."
   expected_output:
     "Informe de diagnóstico capilar estructurado que contenga las siguientes secciones claramente identificadas:
     1. Altura de tono base (valor numérico con descripción)
@@ -9,7 +14,8 @@ hair_diagno_generation:
     3. Análisis de color en medios y puntas (descripción detallada con terminología técnica)
     4. Descripción del tono (familia de color, subtono, matices)
     5. Características y condición del cabello (análisis estructural completo)
-    El informe debe utilizar terminología profesional de colorimetría y estar presentado en un formato claro y conciso. Pero utilizando un lenguaje simple para que un adolecente lo pueda entender."
+    El informe debe utilizar terminología profesional de colorimetría y estar presentado en un formato claro y conciso. Pero utilizando un lenguaje simple para que un adolecente lo pueda entender.
+    Incluir además la URL de la imagen almacenada en Cloudflare."
 
 color_suggestion_generation:
   description: 'Basándote en el diagnóstico capilar previo, debes:
