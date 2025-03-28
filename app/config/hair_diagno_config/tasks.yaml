@@ -1,6 +1,6 @@
 hair_diagno_generation:
   description:
-    "1. PRIMERO: Utiliza la herramienta analyze_image para generar el diagnóstico pasándole como parámetro {image_path}.
+    "1. PRIMERO: analiza la imagen {image_path}.
 
     2. SEGUNDO: Una vez obtenido el diagnóstico, utiliza la herramienta upload_to_cloudflare para subir la imagen a Cloudflare R2, pasándole como parámetro {image_path}.
 
@@ -20,12 +20,7 @@ hair_diagno_generation:
 color_suggestion_generation:
   description: 'Basándote en el diagnóstico capilar previo, debes:
 
-    1. PRIMERO: Utiliza la herramienta analyze_image pasándole como parámetro el valor de {image_path} que se te ha proporcionado.
-    IMPORTANTE: Usa EXACTAMENTE el valor de {image_path}, no escribas literalmente "path/to/image".
-
-    2. SEGUNDO: Incluye TEXTUALMENTE el resultado de tu análisis con la herramienta en tu respuesta final,
-    manteniendo el formato exacto ''## Tool Input: ... ## Tool Output: ...''.
-
+    1. PRIMERO: Analiza la imagen {image_path}
     3. TERCERO: A partir de ambos análisis (el diagnóstico previo y tu análisis directo),
     formula una receta de coloración profesional detallada incluyendo:
     - Formulación técnica completa
@@ -39,10 +34,7 @@ color_suggestion_generation:
 
   expected_output: "Tu respuesta debe seguir este formato exacto:
 
-    ## Tool Input:
-    \"{\\\"image_path\\\": \\\"{image_path}\\\"}\"
-    ## Tool Output:
-    [Aquí el resultado textual completo del análisis con la herramienta]
+ 
 
     ## Formulación Profesional:
     1. Nombre de la mezcla: [nombre descriptivo]
