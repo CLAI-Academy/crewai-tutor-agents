@@ -1,11 +1,20 @@
 from fastapi import FastAPI, Body
 from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware 
 
 # Importando ChillFlow del archivo existente
 from app.main import ChillFlow
 
 app = FastAPI()
 
+# Configurar CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:8080"],  # URL de tu frontend
+    allow_credentials=True,
+    allow_methods=["*"],  # Permitir todos los métodos HTTP
+    allow_headers=["*"],  # Permitir todas las cabeceras
+)
 # Modelo para recibir el mensaje JSON
 class MessageInput(BaseModel):
     message: str
@@ -30,7 +39,7 @@ async def conversation(input_data: MessageInput = Body(...)):
     response = await flow.kickoff_async()
     print(flow.state)
     # Devolver directamente la respuesta
-    return {"response": response}
+    return {"response": str(response.raw)}
 
 if __name__ == "__main__":
     import uvicorn
