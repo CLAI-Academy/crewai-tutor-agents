@@ -33,7 +33,6 @@ class DiagnosticCrew():
             config=self.agents_config['hair_diagno'],
             llm=self.diagnostic_llm,
             tools=[analyze_image],
-            multimodal=True,
             verbose=True
         )
     
