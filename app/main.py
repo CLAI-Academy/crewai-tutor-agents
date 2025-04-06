@@ -39,15 +39,15 @@ class RouterFlow(Flow[InitialState]):
     def route_to_crew(self):
         print(f"Enrutando a la categoría: {self.state.categoria}")
         # Simplificar las condiciones para reducir posibles errores
-        if self.state.categoria == "Peluqueria":
-            return "peluqueria_route"
+        if self.state.categoria == "hairdresser":
+            return "diagnostic_router"
         elif self.state.categoria == "Finanzas":
             return "finanzas_route"
         else:  # Por defecto incluyendo "Neutro"
             return "chill_route"
 
-    @listen("peluqueria_route")
-    def peluqueria_handler(self):
+    @listen("diagnostic_router")
+    def diagnostic_handler(self):
         print("Ejecutando flujo de peluquería")
         return "Respuesta del flujo de peluquería"
 
