@@ -16,7 +16,6 @@ app.add_middleware(
     allow_headers=["Content-Type", "Authorization"],  # Cabeceras permitidas
 )
 
-
 # Modelo para recibir el mensaje JSON
 class MessageInput(BaseModel):
     message: str
