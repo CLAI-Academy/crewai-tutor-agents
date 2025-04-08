@@ -10,12 +10,11 @@ app = FastAPI()
 # Configurar CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8080/"],  # URL de tu frontend
+    allow_origins=["http://localhost:8080", "https://preview--charla-amiga-rapida.lovable.app", "https://lovable.dev/projects/b51d96c6-03e4-4145-af36-6fbe11fd5c39"],  # URL sin barra al final
     allow_credentials=True,
-    allow_methods=[""],  # Permitir todos los métodos HTTP
-    allow_headers=[""],  # Permitir todas las cabeceras
+    allow_methods=["GET", "POST", "OPTIONS"],  # Métodos permitidos
+    allow_headers=["Content-Type", "Authorization"],  # Cabeceras permitidas
 )
-
 
 # Modelo para recibir el mensaje JSON
 class MessageInput(BaseModel):
@@ -41,7 +40,7 @@ async def conversation(input_data: MessageInput = Body(...)):
     response = await flow.kickoff_async()
     print(flow.state)
     # Devolver directamente la respuesta
-    return {"response": response}
+    return {"response": response.raw}
 
 if __name__ == "__main__":
     import uvicorn
