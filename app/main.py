@@ -3,19 +3,20 @@ from crewai.flow.flow import Flow, listen, start, router
 from pydantic import BaseModel
 from app.crews.chill_crew.chill_crew import Chillcrew
 from app.crews.financial_crew.financial_crew import FinanceCrew
-
-
 import openai
+from opik.integrations.crewai import track_crewai
+import opik
+
+opik.configure(use_local=False)
+track_crewai(project_name="CREWAI-TUTOR-AGENTS")
 
 class InitialState(BaseModel):
     categoria: str = ""
     user_input: str = ""
 
 class RouterFlow(Flow[InitialState]):    
-    @start()
-    def start_method(self):
-
-        
+    @start() 
+    def start_method(self):   
         self.chillflow = Chillcrew()   
         self.financialflow = FinanceCrew()   
         print(f"Mensaje del usuario: {self.state.user_input}")
