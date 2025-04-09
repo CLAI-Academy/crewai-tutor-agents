@@ -3,6 +3,7 @@ from crewai.flow.flow import Flow, listen, start, router
 from pydantic import BaseModel
 from app.crews.chill_crew.chill_crew import Chillcrew
 from app.crews.financial_crew.financial_crew import FinanceCrew
+from app.crews.diagno_crew.diagno_crew import DiagnosticCrew
 import openai
 import sys 
 
@@ -13,6 +14,7 @@ class RouterFlow(Flow[ExampleState]):
     
     @start()
     def start_method(self):
+        self.diagnosticFlow = DiagnosticCrew()  
         self.financialflow = FinanceCrew()  
         self.chillflow = Chillcrew()   
         print("Starting the structured flow")
@@ -39,7 +41,8 @@ class RouterFlow(Flow[ExampleState]):
 
     @listen("peluqueria")
     def peluqueria(self):
-        print("Crew peluqueria")
+        result = self.diagnosticFlow.crew().kickoff(inputs={'prompt': mensaje})
+        print(result)
         self.finish_flow() 
 
     @listen("finanzas")
