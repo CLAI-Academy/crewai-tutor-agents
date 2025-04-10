@@ -160,13 +160,10 @@ class ActionsDataTool(BaseTool):
         Si la fecha exacta no se encuentra (por ejemplo, en fin de semana),
         se toma el último registro disponible anterior a esa fecha.
         """
-        # Determinar el rango de fechas a descargar
         fecha_inicio = min(fechas.values()).strftime('%Y-%m-%d')
         fecha_fin = datetime.today().strftime('%Y-%m-%d')
-        
-        # Descargar datos históricos
         datos = yf.Ticker(ticker).history(start=fecha_inicio, end=fecha_fin)
-        
+
         datos_resultado = {}
         for label, fecha in fechas.items():
             fecha_str = fecha.strftime('%Y-%m-%d')
@@ -175,9 +172,12 @@ class ActionsDataTool(BaseTool):
                 fila = datos.loc[fecha_str]
             except KeyError:
                 # Si no existe, se toma el último registro disponible anterior a la fecha
-                fila = datos.loc[:fecha_str].iloc[-1]
-          
-            # Se extraen los datos relevantes y se guardan en un diccionario
+                sub_df = datos.loc[:fecha_str]
+                if sub_df.empty:
+                    datos_resultado[label] = {"error": f"No hay datos disponibles antes de la fecha {fecha_str}"}
+                    continue
+                fila = sub_df.iloc[-1]
+            
             datos_resultado[label] = {
                 "Open": float(fila.get("Open", 0) or 0),
                 "High": float(fila.get("High", 0) or 0),
@@ -185,9 +185,10 @@ class ActionsDataTool(BaseTool):
                 "Close": float(fila.get("Close", 0) or 0),
                 "Adj Close": float(fila.get("Adj Close", 0) or 0) if fila.get("Adj Close") is not None else None,
                 "Volume": float(fila.get("Volume", 0) or 0)
-                }
+            }
 
         return datos_resultado
+
 
 class TickerFinderToolInput(BaseModel):
     """Esquema de entrada para la herramienta Ticker Finder Tool."""
@@ -291,5 +292,5 @@ class TickerFinderTool(BaseTool):
 
 # Ejecución para probar las tool
 if __name__ == "__main__":
-    tool = TickerFinderTool(risk="low")
+    tool = ActionsDataTool(ticker="SPGI")
     print(tool._run())
