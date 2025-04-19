@@ -3,6 +3,7 @@ from crewai.flow.flow import Flow, listen, start, router
 from pydantic import BaseModel
 from app.crews.chill_crew.chill_crew import Chillcrew
 from app.crews.financial_crew.financial_crew import FinanceCrew
+from app.crews.diagno_crew.diagno_crew import DiagnosticCrew
 import openai
 from opik.integrations.crewai import track_crewai
 import opik
@@ -16,7 +17,8 @@ class InitialState(BaseModel):
 
 class RouterFlow(Flow[InitialState]):    
     @start() 
-    def start_method(self):   
+    def start_method(self):  
+        self.diagnosticFlow = DiagnosticCrew()   
         self.chillflow = Chillcrew()   
         self.financialflow = FinanceCrew()   
         print(f"Mensaje del usuario: {self.state.user_input}")
@@ -40,7 +42,7 @@ class RouterFlow(Flow[InitialState]):
     def route_to_crew(self):
         print(f"Enrutando a la categoría: {self.state.categoria}")
         # Simplificar las condiciones para reducir posibles errores
-        if self.state.categoria == "hairdresser":
+        if self.state.categoria == "Peluqueria":
             return "diagnostic_router"
         elif self.state.categoria == "Finanzas":
             return "finanzas_route"
@@ -49,8 +51,9 @@ class RouterFlow(Flow[InitialState]):
 
     @listen("diagnostic_router")
     def diagnostic_handler(self):
-        print("Ejecutando flujo de peluquería")
-        return "Respuesta del flujo de peluquería"
+        result = self.diagnosticFlow.crew().kickoff(inputs={'prompt': mensaje})
+        print(result)
+        self.finish_flow() 
 
     @listen("finanzas_route")
     def finanzas_handler(self):
