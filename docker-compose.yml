@@ -11,7 +11,7 @@ services:
       - PYTHONUNBUFFERED=1
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - LOG_LEVEL=DEBUG
-    command: make dev
+    command: sh -c 'echo Y | make dev'
     develop:
       watch:
         - action: sync

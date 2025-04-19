@@ -4,23 +4,22 @@ from crewai.project import CrewBase, agent, crew, task
 import yaml
 import os
 
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 @CrewBase
 class FinanceCrew():
-    agents_config=os.path.join(BASE_DIR, 'config/finances_config/agents.yaml')
-    tasks_config=os.path.join(BASE_DIR, 'config/finances_config/tasks.yaml')
+    agents_config = os.path.join(BASE_DIR, 'config/finances_config/agents.yaml')
+    tasks_config = os.path.join(BASE_DIR, 'config/finances_config/tasks.yaml')
 
     llm = LLM(model="gpt-4o-mini")
-    
+
     @agent
     def financial_evaluator(self) -> Agent:
         return Agent(
             config=self.agents_config['financial_evaluator'],
             llm=self.llm
         )
-    
+
     @agent
     def ticker_finder(self) -> Agent:
         return Agent(
@@ -28,7 +27,7 @@ class FinanceCrew():
             tools=[TickerFinderTool()],
             llm=self.llm
         )
-    
+
     @agent
     def financial_simulator(self) -> Agent:
         return Agent(
@@ -36,42 +35,42 @@ class FinanceCrew():
             tools=[CryptoDataTool(), ActionsDataTool()],
             llm=self.llm
         )
-    
+
     @agent
     def financial_optimizer(self) -> Agent:
         return Agent(
             config=self.agents_config['financial_optimizer'],
             llm=self.llm
         )
-    
+
     @task
     def analize_cashflow(self) -> Task:
         return Task(
             config=self.tasks_config['analize_cashflow'],
             agent=self.financial_evaluator()
         )
-    
+
     @task
     def find_tickers(self) -> Task:
         return Task(
             config=self.tasks_config['find_tickers'],
             agent=self.ticker_finder()
         )
-    
+
     @task
     def generate_investment_scenarios(self) -> Task:
         return Task(
             config=self.tasks_config['generate_investment_scenarios'],
             agent=self.financial_simulator()
         )
-    
+
     @task
     def optimizated_investment_scenarios(self) -> Task:
         return Task(
             config=self.tasks_config['optimizated_investment_scenarios'],
             agent=self.financial_optimizer()
         )
-    
+
     @crew
     def crew(self) -> Crew:
         return Crew(
@@ -92,15 +91,8 @@ class FinanceCrew():
         )
 
 if __name__ == '__main__':
-    # Crea una instancia de FinanceCrew y ejecuta el crew
     finance_crew_instance = FinanceCrew()
     crew_instance = finance_crew_instance.crew()
-    
-    # Establece la entrada esperada; según tu configuración, los agentes esperan la clave 'prompt'
     inputs = {'prompt': "Cobro 5000 euros al mes, puedo invertir 1000 euros al mes, estoy harto de que mi dinero solo pierda valor, ¡quiero ganar dinero como sea, quiero riesgo!"}
-    
-    # Ejecuta el crew y almacena el resultado
     result = crew_instance.kickoff(inputs=inputs)
-    
-    # Imprime el resultado en consola
     print(result)

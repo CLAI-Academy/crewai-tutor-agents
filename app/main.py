@@ -5,67 +5,77 @@ from app.crews.chill_crew.chill_crew import Chillcrew
 from app.crews.financial_crew.financial_crew import FinanceCrew
 from app.crews.diagno_crew.diagno_crew import DiagnosticCrew
 import openai
-import sys 
+from opik.integrations.crewai import track_crewai
+import opik
 
-class ExampleState(BaseModel):
-    categorias: str = ""
+opik.configure(use_local=False)
+track_crewai(project_name="CREWAI-TUTOR-AGENTS")
 
-class RouterFlow(Flow[ExampleState]):
-    
-    @start()
-    def start_method(self):
-        self.diagnosticFlow = DiagnosticCrew()  
-        self.financialflow = FinanceCrew()  
+class InitialState(BaseModel):
+    categoria: str = ""
+    user_input: str = ""
+
+class RouterFlow(Flow[InitialState]):    
+    @start() 
+    def start_method(self):  
+        self.diagnosticFlow = DiagnosticCrew()   
         self.chillflow = Chillcrew()   
-        print("Starting the structured flow")
+        self.financialflow = FinanceCrew()   
+        print(f"Mensaje del usuario: {self.state.user_input}")
+        
+        # Clasificar el mensaje
         client = openai.Client()
         respuesta = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": "Eres un agente experto en detectar la categoria de una consulta. Debes responder solo la categoria de la consulta. Las categorias de la consulta pueden ser: Peluqueria, Finanzas, Neutro"},
-            {"role": "user", "content": mensaje}
-        ]
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "Eres un agente experto en detectar la categoria de una consulta. Debes responder solo la categoria de la consulta. Las categorias de la consulta pueden ser: Peluqueria, Finanzas, Neutro"},
+                {"role": "user", "content": self.state.user_input}
+            ]
         )
         categoria = respuesta.choices[0].message.content.strip()
-        print(categoria)
-        self.state.categorias = categoria
+        print(f"Categoría detectada: {categoria}")
+        self.state.categoria = categoria
+        
+        return self.state
 
     @router(start_method)
-    def second_method(self):
-        if self.state.categorias == "Peluqueria":
-            return("peluqueria")
-        elif self.state.categorias == "Finanzas":
-            return("finanzas")
-        elif self.state.categorias == "Neutro":
-            return("chill")
+    def route_to_crew(self):
+        print(f"Enrutando a la categoría: {self.state.categoria}")
+        # Simplificar las condiciones para reducir posibles errores
+        if self.state.categoria == "Peluquería":
+            return "diagnostic_router"
+        elif self.state.categoria == "Finanzas":
+            return "finanzas_route"
+        else:  # Por defecto incluyendo "Neutro"
+            return "chill_route"
 
-    @listen("peluqueria")
+    @listen("diagnostic_router")
     def peluqueria(self):
         result = self.diagnosticFlow.crew().kickoff(inputs={'prompt': mensaje})
         print(result)
         self.finish_flow() 
 
-    @listen("finanzas")
-    def finanzas(self):
-        result = self.financialflow.crew().kickoff(inputs={'prompt': mensaje})
-        print(result)
-        self.finish_flow()
+    @listen("finanzas_route")
+    def finanzas_handler(self):
+        print("Ejecutando flujo de finanzas")
+        result = self.financialflow.crew().kickoff(inputs={'prompt': self.state.user_input})
         return result
 
-    @listen("chill")
-    def chill(self):
-        result = self.chillflow.crew().kickoff(inputs={'message': mensaje})
-        print(result)
-        self.finish_flow() 
+    @listen("chill_route")
+    def chill_handler(self):
+        print("Ejecutando flujo chill")
+        result = self.chillflow.crew().kickoff(inputs={'message': self.state.user_input})
         return result
-
-    def finish_flow(self):
-        print("Terminando el flow.")
-        sys.exit()  # Detiene la ejecución del script
-        
 
 if __name__ == "__main__":
-    # Crea una instancia del flow
-    mensaje = "Cobro 5000 euros al mes, puedo invertir 1000 euros al mes, estoy harto de que mi dinero solo pierda valor, ¡quiero ganar dinero como sea, quiero riesgo!"
+    # Inicializar estado
+    mensaje = "Hola, ¿cómo estás hoy?"
+
+    # Crear y ejecutar el flujo
     flow = RouterFlow()
-    flow.kickoff()
+    flow.state.user_input = mensaje
+    resultado = flow.kickoff()
+    
+    # Imprimir resultado final
+    print("\nResultado final del flujo:")
+    print(resultado)
