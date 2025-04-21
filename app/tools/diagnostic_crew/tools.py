@@ -2,11 +2,8 @@ from crewai.tools import tool
 import http.client
 from datetime import datetime
 import random
-
-import http.client
 import json
 import os
-from langchain.tools import tool
 
 import base64
 from openai import OpenAI
