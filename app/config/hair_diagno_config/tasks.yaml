@@ -1,0 +1,67 @@
+hair_diagno_generation:
+  description: "1. PRIMERO: analiza la imagen {image_path}.
+
+    3. TERCERO: Estructura el diagnóstico en el formato indicado en el expected_output, e incluye la URL pública retornada por la herramienta de upload.
+
+    Es OBLIGATORIO que uses AMBAS herramientas en este orden."
+  expected_output:
+    "Informe de diagnóstico capilar estructurado que contenga las siguientes secciones claramente identificadas:
+    1. Altura de tono base (valor numérico con descripción)
+    2. Porcentaje de canas (valor porcentual aproximado; 0% 25% 50% 75% 100%)
+    3. Análisis de color en medios y puntas (descripción detallada con terminología técnica)
+    4. Descripción del tono (familia de color, subtono, matices)
+    5. Características y condición del cabello (análisis estructural completo)
+    El informe debe utilizar terminología profesional de colorimetría y estar presentado en un formato claro y conciso. Pero utilizando un lenguaje simple para que un adolecente lo pueda entender.
+    Incluir además la URL de la imagen almacenada en Cloudflare."
+
+color_suggestion_generation:
+  description: "Basándote en el diagnóstico capilar previo, debes:
+
+    1. PRIMERO: Analiza la imagen {image_path}
+    3. TERCERO: A partir de ambos análisis (el diagnóstico previo y tu análisis directo),
+    formula una receta de coloración profesional detallada incluyendo:
+    - Formulación técnica completa
+    - Consideraciones especiales según las características del cabello
+    - Recomendaciones de cuidado posterior
+    - Plan de mantenimiento personalizado
+    - Explicación detallada de tu razonamiento
+
+    Es OBLIGATORIO que uses la herramienta con el valor correcto de {image_path} y que incluyas
+    su output completo en tu respuesta final."
+
+  expected_output: "Tu respuesta debe seguir este formato exacto:
+
+
+
+    ## Formulación Profesional:
+    1. Nombre de la mezcla: [nombre descriptivo]
+    2. Tipo de mezcla: [tipo]
+    3. Nombre de la coloración: [nombre]
+    4. Tipo de coloración: [tipo]
+    5. Descripción detallada: [descripción]
+    6. Componentes:
+    - [código]: [cantidad]
+    - [código]: [cantidad]
+    7. Volumen del revelador: [volumen]
+    8. Tiempo de aplicación: [tiempo]
+
+    ## Consideraciones Especiales:
+    - [consideración 1]
+    - [consideración 2]
+    - [consideración 3]
+
+    ## Cuidados Posteriores a la Aplicación:
+    - [recomendación 1]
+    - [recomendación 2]
+    - [recomendación 3]
+
+    ## Plan de Mantenimiento:
+    - [plan 1]
+    - [plan 2]
+    - [plan 3]
+
+    ## Resultado Esperado:
+    [descripción detallada del resultado]
+
+    ## Explicación Técnica:
+    [explicación detallada del razonamiento detrás de la formulación, apoyándote en el análisis previo y los detalles técnicos observados]"

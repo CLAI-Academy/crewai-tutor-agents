@@ -1,0 +1,73 @@
+analize_cashflow:
+  description: >
+    Analize the cashflow of the following text:
+    <text>
+    {prompt}
+    </text>
+  expected_output: >
+    Returns the avaible quantity to invest from the user's cashflow
+
+find_tickers:
+  description: >
+    Find the tickers of the 3 best companies to invest in based on the risk level and the investment amount. The risk level will be very_high, high, medium, low.
+    You will extract the risk level and the investment amount from the following text:
+    <text>
+    {prompt}
+    </text>
+  expected_output: >
+    A list of 3 tickers of the best companies to invest in based on the risk level and the investment amount.
+
+generate_investment_scenarios:
+  description: >
+    Generate investment scenarios, you need to pass the tickers to ActionsDataTool, and generate another crypto-scenario with the tool CryptoDataTool(This scenario gonna be risk because the volatibity of cryptos)
+  expected_output: >
+    Returns the investment scenarios with the following format:
+    <example>
+    - Scenario 1:
+      - Risk: High
+      - Quantity of money to invest: 1000
+      - Time to invest: 1 year
+      - Aproximate return: 10%
+      - Dividend yield: 2%(if applicable)
+      - Investment type: Crypto
+      - Name of the investment: Bitcoin
+      - Monthly income: 100 euros
+    - Scenario 2:
+      - Risk: Low
+      - Quantity of money to invest: 1000
+      - Time to invest: 1 year
+      - Aproximate return: 5%
+      - Dividend yield: 1%(if applicable)
+      - Investment type: Actions
+      - Name of the investment: Company X
+      - Monthly income: 100 euros
+    </example>
+
+optimizated_investment_scenarios:
+  description: >
+    Optimize investment scenarios based on cashflow analysis and generated investment scenarios data. 
+    Create a comprehensive investment strategy report that balances risk/reward profiles, liquidity needs, 
+    and diversification principles while incorporating historical performance data of stocks and cryptocurrencies.
+  expected_output: >
+    Returns optimized investment scenarios in Spanish in markdown format, featuring a detailed table with:
+    - Scenario identification and strategy name
+    - Risk classification (Low/Medium/High/Very High)
+    - Recommended investment amount with allocation percentages
+    - Investment timeframe with milestone projections
+    - Expected return rate (annualized)
+    - Dividend yield (if applicable)
+    - Total return calculation (capital appreciation + dividend yield)
+    - Projected final value of investment
+    - Asset class categorization (Stock/ETF/Crypto/etc.)
+    - Specific investment vehicle name/ticker
+    - Estimated monthly passive income
+    - Reference URLs (finance.yahoo.com for stocks, coinmarketcap.com for cryptocurrencies)
+    - Detailed rationale for each selection based on:
+      * Historical volatility metrics
+      * Dividend consistency (for income-generating assets)
+      * Correlation with broader market indicators
+      * Technical and fundamental analysis indicators
+      * Current market conditions and risk assessment
+    
+    Include scenario comparisons, a risk-adjusted returns analysis, and implementation recommendations.
+    The report must also feature a visual comparison of scenarios and a comprehensive executive summary.
