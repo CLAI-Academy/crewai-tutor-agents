@@ -16,13 +16,13 @@ class DiagnosticCrew():
     
     # Creating LLM instances with specific configurations
     diagnostic_llm = LLM(
-        model="gpt-4o-mini",
+        model="gpt-4.1-mini",
         temperature=0.7,
         max_tokens=1000
     )
     
     suggestion_llm = LLM(
-        model="gpt-4o-mini",
+        model="gpt-4.1-mini",
         temperature=0.8,
         max_tokens=1500
     )
@@ -41,7 +41,7 @@ class DiagnosticCrew():
         return Agent(
             config=self.agents_config['color_suggestion'],
             llm=self.suggestion_llm,
-            multimodal=True,
+            tools=[analyze_image],
             verbose=True
         )
     
