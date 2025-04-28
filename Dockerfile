@@ -51,4 +51,4 @@ USER appuser
 EXPOSE 8000 8888
 
 # Run the app using Poetry
-CMD ["python", "-m", "app.main"]
+CMD ["python", "-m", "app.api.api"]
