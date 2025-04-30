@@ -1,5 +1,5 @@
 hair_diagno_generation:
-  description: "1. PRIMERO: analiza la imagen {image_path}.
+  description: "1. PRIMERO: analiza la imagen {image}.
 
     3. TERCERO: Estructura el diagnóstico en el formato indicado en el expected_output, e incluye la URL pública retornada por la herramienta de upload.
 
@@ -17,7 +17,7 @@ hair_diagno_generation:
 color_suggestion_generation:
   description: "Basándote en el diagnóstico capilar previo, debes:
 
-    1. PRIMERO: Analiza la imagen {image_path}
+    1. PRIMERO: Analiza la imagen {image}
     3. TERCERO: A partir de ambos análisis (el diagnóstico previo y tu análisis directo),
     formula una receta de coloración profesional detallada incluyendo:
     - Formulación técnica completa
@@ -26,7 +26,7 @@ color_suggestion_generation:
     - Plan de mantenimiento personalizado
     - Explicación detallada de tu razonamiento
 
-    Es OBLIGATORIO que uses la herramienta con el valor correcto de {image_path} y que incluyas
+    Es OBLIGATORIO que uses la herramienta con el valor correcto de {image} y que incluyas
     su output completo en tu respuesta final."
 
   expected_output: "Tu respuesta debe seguir este formato exacto:
