@@ -1,73 +1,83 @@
 analize_cashflow:
   description: >
-    Analize the cashflow of the following text:
+    Analiza la siguiente información financiera del usuario:
     <text>
     {prompt}
     </text>
+    Tu objetivo es entender cuánto dinero puede invertir la persona de forma segura cada mes.
   expected_output: >
-    Returns the avaible quantity to invest from the user's cashflow
+    Un resumen claro que muestre:
+    - Cuánto dinero gana al mes
+    - Cuáles son sus gastos fijos
+    - Cuánto dinero le queda disponible para invertir
+    - Una explicación sencilla de cómo se llegó a esa cantidad
 
 find_tickers:
   description: >
-    Find the tickers of the 3 best companies to invest in based on the risk level and the investment amount. The risk level will be very_high, high, medium, low.
-    You will extract the risk level and the investment amount from the following text:
+    Encuentra las 3 mejores empresas para invertir según:
+    - El nivel de riesgo que la persona quiere asumir (bajo, medio, alto, muy alto)
+    - La cantidad de dinero que puede invertir
+    Extrae esta información del siguiente texto:
     <text>
     {prompt}
     </text>
   expected_output: >
-    A list of 3 tickers of the best companies to invest in based on the risk level and the investment amount.
+    Una lista de 3 empresas recomendadas para invertir, explicando:
+    - Por qué cada empresa es una buena opción
+    - Qué nivel de riesgo tiene cada una
+    - Cuánto dinero se recomienda invertir en cada una
 
 generate_investment_scenarios:
   description: >
-    Generate investment scenarios, you need to pass the tickers to ActionsDataTool, and generate another crypto-scenario with the tool CryptoDataTool(This scenario gonna be risk because the volatibity of cryptos)
+    Crea diferentes escenarios de inversión que muestren cómo podría crecer el dinero del usuario.
+    Usa la herramienta ActionsDataTool para analizar acciones y CryptoDataTool para criptomonedas.
+    Crea al menos dos escenarios:
+    1. Un escenario más conservador con acciones
+    2. Un escenario más arriesgado con criptomonedas
   expected_output: >
-    Returns the investment scenarios with the following format:
+    Escenarios de inversión detallados con el siguiente formato:
     <example>
-    - Scenario 1:
-      - Risk: High
-      - Quantity of money to invest: 1000
-      - Time to invest: 1 year
-      - Aproximate return: 10%
-      - Dividend yield: 2%(if applicable)
-      - Investment type: Crypto
-      - Name of the investment: Bitcoin
-      - Monthly income: 100 euros
-    - Scenario 2:
-      - Risk: Low
-      - Quantity of money to invest: 1000
-      - Time to invest: 1 year
-      - Aproximate return: 5%
-      - Dividend yield: 1%(if applicable)
-      - Investment type: Actions
-      - Name of the investment: Company X
-      - Monthly income: 100 euros
+    - Escenario Conservador:
+      - Riesgo: Bajo
+      - Dinero a invertir: 1000 euros
+      - Tiempo: 1 año
+      - Rentabilidad esperada: 5%
+      - Tipo de inversión: Acciones
+      - Empresa: Ejemplo S.A.
+      - Ingreso mensual estimado: 50 euros
+    - Escenario Arriesgado:
+      - Riesgo: Alto
+      - Dinero a invertir: 1000 euros
+      - Tiempo: 1 año
+      - Rentabilidad esperada: 15%
+      - Tipo de inversión: Criptomonedas
+      - Moneda: Bitcoin
+      - Ingreso mensual estimado: 100 euros
     </example>
 
 optimizated_investment_scenarios:
   description: >
-    Optimize investment scenarios based on cashflow analysis and generated investment scenarios data. 
-    Create a comprehensive investment strategy report that balances risk/reward profiles, liquidity needs, 
-    and diversification principles while incorporating historical performance data of stocks and cryptocurrencies.
+    Crea un plan de inversión personalizado basado en:
+    - El análisis del flujo de efectivo del usuario
+    - Los escenarios de inversión generados
+    - El perfil de riesgo del usuario
+    El objetivo es crear un plan que:
+    - Se ajuste a la situación financiera del usuario
+    - Equilibre riesgo y rentabilidad
+    - Sea fácil de entender y seguir
+    - Incluya recomendaciones prácticas
   expected_output: >
-    Returns optimized investment scenarios in Spanish in markdown format, featuring a detailed table with:
-    - Scenario identification and strategy name
-    - Risk classification (Low/Medium/High/Very High)
-    - Recommended investment amount with allocation percentages
-    - Investment timeframe with milestone projections
-    - Expected return rate (annualized)
-    - Dividend yield (if applicable)
-    - Total return calculation (capital appreciation + dividend yield)
-    - Projected final value of investment
-    - Asset class categorization (Stock/ETF/Crypto/etc.)
-    - Specific investment vehicle name/ticker
-    - Estimated monthly passive income
-    - Reference URLs (finance.yahoo.com for stocks, coinmarketcap.com for cryptocurrencies)
-    - Detailed rationale for each selection based on:
-      * Historical volatility metrics
-      * Dividend consistency (for income-generating assets)
-      * Correlation with broader market indicators
-      * Technical and fundamental analysis indicators
-      * Current market conditions and risk assessment
-    
-    Include scenario comparisons, a risk-adjusted returns analysis, and implementation recommendations.
-    The report must also feature a visual comparison of scenarios and a comprehensive executive summary.
+    Un plan de inversión completo que incluya:
+    1. Resumen de la situación financiera
+    2. Diferentes opciones de inversión con:
+       - Nivel de riesgo (Bajo/Medio/Alto/Muy Alto)
+       - Cantidad recomendada a invertir
+       - Tiempo recomendado
+       - Rentabilidad esperada
+       - Ingresos mensuales estimados
+    3. Explicación clara de cada opción
+    4. Comparación entre las diferentes opciones
+    5. Recomendaciones finales
+    6. Consejos prácticos para empezar
+    7. Preguntas frecuentes y respuestas
+    8. Todo explicado en español de forma sencilla
