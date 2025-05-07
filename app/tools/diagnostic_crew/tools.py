@@ -10,7 +10,7 @@ from openai import OpenAI
 from typing import Optional
 
 @tool
-def analyze_image(image_path: str, prompt: Optional[str] = "What is in this image?") -> str:
+def analyze_image(image: str, prompt: Optional[str] = "What is in this image?") -> str:
     """
     Analiza una imagen utilizando el modelo GPT-4 Vision de OpenAI.
     
@@ -25,13 +25,13 @@ def analyze_image(image_path: str, prompt: Optional[str] = "What is in this imag
         # Inicializar el cliente de OpenAI
         client = OpenAI()
         
-        # Codificar la imagen en base64
-        def encode_image(image_path):
-            with open(image_path, "rb") as image_file:
-                return base64.b64encode(image_file.read()).decode("utf-8")
+        # # Codificar la imagen en base64
+        # def encode_image(image_path):
+        #     with open(image_path, "rb") as image_file:
+        #         return base64.b64encode(image_file.read()).decode("utf-8")
         
-        # Obtener la imagen en formato base64
-        base64_image = encode_image(image_path)
+        # # Obtener la imagen en formato base64
+        # base64_image = encode_image(image_path)
         
         # Crear la solicitud a la API
         response = client.chat.completions.create(
@@ -47,7 +47,7 @@ def analyze_image(image_path: str, prompt: Optional[str] = "What is in this imag
                         {
                             "type": "image_url",
                             "image_url": {
-                                "url": f"data:image/jpeg;base64,{base64_image}"
+                                "url": image
                             },
                         },
                     ],
