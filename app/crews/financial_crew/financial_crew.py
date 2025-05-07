@@ -3,6 +3,10 @@ from app.tools.financial_crew.tool import CryptoDataTool, ActionsDataTool, Ticke
 from crewai.project import CrewBase, agent, crew, task
 import yaml
 import os
+from app.utils.list_agents import list_agents
+import asyncio
+#import websocket manager
+from app.utils.websockets.manager import ws_manager
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -12,6 +16,32 @@ class FinanceCrew():
     tasks_config = os.path.join(BASE_DIR, 'config/finances_config/tasks.yaml')
 
     llm = LLM(model="gpt-4o-mini")
+
+    def __init__(self, client_id: str):
+        self.client_id = client_id
+        self.agents_list = list_agents(self.agents_config)
+        self._crew_instance = None  # <— cache seguro
+
+        
+    def get_crew(self):
+        if self._crew_instance is None:
+            self._crew_instance = self.crew()   # llama al método decorado
+        return self._crew_instance
+
+        
+    def create_callback(self, agent_name: str):
+        payload = {
+            "mode":   "finanzas",
+            "agents": self.agents_list,
+            "actual_agent": agent_name
+        }
+
+        # función *síncrona* (CrewAI la invoca dentro de un hilo worker)
+        def _callback(_):
+            # en ese hilo NO hay event-loop → podemos usar asyncio.run()
+            asyncio.run(ws_manager.send_to_client(self.client_id, payload))
+
+        return _callback
 
     @agent
     def financial_evaluator(self) -> Agent:
@@ -47,28 +77,31 @@ class FinanceCrew():
     def analize_cashflow(self) -> Task:
         return Task(
             config=self.tasks_config['analize_cashflow'],
-            agent=self.financial_evaluator()
+            agent=self.financial_evaluator(),
+            callback=self.create_callback("ticker_finder")
         )
 
     @task
     def find_tickers(self) -> Task:
         return Task(
             config=self.tasks_config['find_tickers'],
-            agent=self.ticker_finder()
+            agent=self.ticker_finder(),
+            callback=self.create_callback("financial_simulator")
         )
 
     @task
     def generate_investment_scenarios(self) -> Task:
         return Task(
             config=self.tasks_config['generate_investment_scenarios'],
-            agent=self.financial_simulator()
+            agent=self.financial_simulator(),
+            callback=self.create_callback("financial_optimizer")
         )
 
     @task
     def optimizated_investment_scenarios(self) -> Task:
         return Task(
             config=self.tasks_config['optimizated_investment_scenarios'],
-            agent=self.financial_optimizer()
+            agent=self.financial_optimizer(),
         )
 
     @crew
