@@ -121,7 +121,7 @@ async def process_flow_with_websocket(client_id: str, user_message: str, image_d
     """
     try:
         # Crear una nueva instancia de RouterFlow para este cliente
-        # (o usa la instancia global si prefieres)
+        # (o usa la instancia global si prefieres))
         local_flow = RouterFlow()
         
         # Actualizar el estado
