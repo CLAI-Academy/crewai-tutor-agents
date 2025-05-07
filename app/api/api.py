@@ -20,7 +20,8 @@ app.add_middleware(
 # Modelo para recibir el mensaje JSON
 class MessageInput(BaseModel):
     message: str
-    image: str = ""
+    image: Optional[str] = None
+
 # Creamos una única instancia del flow para toda la aplicación
 flow = RouterFlow()
 
@@ -28,41 +29,29 @@ flow = RouterFlow()
 async def pong():
     return"pong"
 
-from fastapi import FastAPI, Body
-
-# Importar la utilidad que creamos
-from app.utils.image_utils import TempImage
-
-# Tu código existente aquí...
-# Creamos una única instancia del flow para toda la aplicación
-flow = RouterFlow()
-
-class MessageInput(BaseModel):
-    message: str
-    image: Optional[str] = None
-
 @app.post("/conversation")
 async def conversation(input_data: MessageInput = Body(...)):
     """
     Endpoint para procesar un mensaje y devolver una respuesta.
+    
+    Recibe:
+    - message: Texto del mensaje del usuario
+    - image: URL de la imagen en Supabase Storage (opcional)
     """
-    # Usar el administrador de contexto para manejar la imagen temporal
-    with TempImage(input_data.image) as image_path:
-        # Actualizar el estado con el mensaje del usuario y la ruta de la imagen (si existe)
-        flow.state.user_input = input_data.message
-        flow.state.image_path = image_path if image_path else ""
-        
-        # Procesar la conversación
-        response = await flow.kickoff_async()
-        print(flow.state)
-        
-         # Comprobar el tipo de respuesta
-        if hasattr(response, 'raw'):
-            return {"response": response.raw}
-        else:
-            # Si response es una cadena o de otro tipo sin atributo raw
-            return {"response": response}
-    # La imagen se elimina automáticamente al salir del bloque "with"
+    # Actualizar el estado con el mensaje del usuario y la URL de la imagen (si existe)
+    flow.state.user_input = input_data.message
+    flow.state.image = input_data.image if input_data.image else ""
+    
+    # Procesar la conversación
+    response = await flow.kickoff_async()
+    print(flow.state)
+    
+    # Comprobar el tipo de respuesta
+    if hasattr(response, 'raw'):
+        return {"response": response.raw}
+    else:
+        # Si response es una cadena o de otro tipo sin atributo raw
+        return {"response": response}
 
 if __name__ == "__main__":
     import uvicorn

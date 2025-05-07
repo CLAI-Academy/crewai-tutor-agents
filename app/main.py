@@ -14,7 +14,7 @@ track_crewai(project_name="CREWAI-TUTOR-AGENTS")
 class InitialState(BaseModel):
     categoria: str = ""
     user_input: str = ""
-    image_path: str = ""
+    image: str = ""
 
 class RouterFlow(Flow[InitialState]):    
     @start() 
@@ -52,7 +52,7 @@ class RouterFlow(Flow[InitialState]):
 
     @listen("diagnostic_router")
     def diagnostic_handler(self):
-        result = self.diagnosticFlow.crew().kickoff(inputs={'prompt': self.state.user_input, 'image_path': self.state.image_path})
+        result = self.diagnosticFlow.crew().kickoff(inputs={'prompt': self.state.user_input, 'image': self.state.image})
         return result 
 
     @listen("finanzas_route")
