@@ -105,7 +105,6 @@ class FinanceCrew():
             config=self.tasks_config['optimizated_investment_scenarios'],
             agent=self.financial_optimizer(),
             output_pydantic=OptimizedInvestmentReport
-            agent=self.financial_optimizer(),
         )
 
     @crew
