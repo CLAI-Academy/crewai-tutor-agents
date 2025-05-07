@@ -7,6 +7,7 @@ from app.crews.diagno_crew.diagno_crew import DiagnosticCrew
 import openai
 from opik.integrations.crewai import track_crewai
 import opik
+from app.utils.websockets.manager import ws_manager
 
 opik.configure(use_local=False)
 track_crewai(project_name="CREWAI-TUTOR-AGENTS")
@@ -15,13 +16,17 @@ class InitialState(BaseModel):
     categoria: str = ""
     user_input: str = ""
     image: str = ""
+    client_id: str = ""
 
 class RouterFlow(Flow[InitialState]):    
     @start() 
-    def start_method(self):  
-        self.diagnosticFlow = DiagnosticCrew()   
-        self.chillflow = Chillcrew()   
-        self.financialflow = FinanceCrew()   
+    async def start_method(self):  
+        self.diagnosticFlow = DiagnosticCrew(self.state.client_id)   
+        self.chillflow = Chillcrew(self.state.client_id)   
+        self.financialflow = FinanceCrew(self.state.client_id)   
+         # Notificar status: pensando
+    
+        
         print(f"Mensaje del usuario: {self.state.user_input}")
         
         # Clasificar el mensaje
@@ -51,20 +56,42 @@ class RouterFlow(Flow[InitialState]):
             return "chill_route"
 
     @listen("diagnostic_router")
-    def diagnostic_handler(self):
-        result = self.diagnosticFlow.crew().kickoff(inputs={'prompt': self.state.user_input, 'image': self.state.image})
+    async def diagnostic_handler(self):
+        # Establecer modo peluquería
+        await ws_manager.send_to_client(self.state.client_id, {
+                "mode": "peluqueria",
+                "agents": self.diagnosticFlow.agents_list,
+                "actual_agent": "hair_diagno"
+            })
+        finance_crew = self.diagnosticFlow.get_crew()
+        result = await finance_crew.kickoff_async(inputs={'prompt': self.state.user_input, 'image': self.state.image})
         return result 
 
     @listen("finanzas_route")
-    def finanzas_handler(self):
+    async def finanzas_handler(self):
+        # Enviamos el estado por websocket  
+        await ws_manager.send_to_client(self.state.client_id, {
+                "mode": "finanzas",
+                "agents": self.financialflow.agents_list,
+                "actual_agent": "financial_evaluator"
+            })
+        
         print("Ejecutando flujo de finanzas")
-        result = self.financialflow.crew().kickoff(inputs={'prompt': self.state.user_input})
+        financial_crew = self.financialflow.get_crew()
+        result = await financial_crew.kickoff_async(inputs={'prompt': self.state.user_input})
         return result
 
     @listen("chill_route")
-    def chill_handler(self):
+    async def chill_handler(self):
+        # Enviamos el estado por websocket
+        await ws_manager.send_to_client(self.state.client_id, {
+                "mode": "chill",
+                "agents": self.chillflow.agents_list,
+                "actual_agent": "agente_conversacional"
+            })
         print("Ejecutando flujo chill")
-        result = self.chillflow.crew().kickoff(inputs={'message': self.state.user_input})
+        chill_crew = self.chillflow.get_crew()
+        result = await chill_crew.kickoff_async(inputs={'message': self.state.user_input})
         return result
 
 if __name__ == "__main__":

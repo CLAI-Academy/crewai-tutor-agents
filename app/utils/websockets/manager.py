@@ -48,25 +48,6 @@ class WebSocketManager:
         if websocket in self.connection_info:
             del self.connection_info[websocket]
     
-    async def broadcast(self, message: Dict[str, Any]):
-        """
-        Envía un mensaje a todas las conexiones activas.
-        
-        Args:
-            message: Mensaje a enviar (diccionario que se convertirá a JSON)
-        """
-        disconnected = []
-        for connection in self.active_connections:
-            try:
-                await connection.send_json(message)
-            except Exception as e:
-                print(f"Error al enviar mensaje por WebSocket: {e}")
-                disconnected.append(connection)
-        
-        # Limpiar conexiones desconectadas
-        for conn in disconnected:
-            self.disconnect(conn)
-    
     async def send_to_client(self, client_id: str, message: Dict[str, Any]):
         """
         Envía un mensaje a un cliente específico por su ID.
