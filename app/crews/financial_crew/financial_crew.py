@@ -3,6 +3,7 @@ from app.tools.financial_crew.tool import CryptoDataTool, ActionsDataTool, Ticke
 from crewai.project import CrewBase, agent, crew, task
 import yaml
 import os
+from app.crews.financial_crew.models import OptimizedInvestmentReport
 from app.utils.list_agents import list_agents
 import asyncio
 #import websocket manager
@@ -15,7 +16,8 @@ class FinanceCrew():
     agents_config = os.path.join(BASE_DIR, 'config/finances_config/agents.yaml')
     tasks_config = os.path.join(BASE_DIR, 'config/finances_config/tasks.yaml')
 
-    llm = LLM(model="gpt-4o-mini")
+    llm = LLM(model="gpt-4o-mini", temperature=0.3)
+    creative_llm = LLM(model="gpt-4o-mini", temperature=0.7)
 
     def __init__(self, client_id: str):
         self.client_id = client_id
@@ -63,14 +65,14 @@ class FinanceCrew():
         return Agent(
             config=self.agents_config['financial_simulator'],
             tools=[CryptoDataTool(), ActionsDataTool()],
-            llm=self.llm
+            llm=self.creative_llm
         )
 
     @agent
     def financial_optimizer(self) -> Agent:
         return Agent(
             config=self.agents_config['financial_optimizer'],
-            llm=self.llm
+            llm=self.creative_llm
         )
 
     @task
@@ -102,6 +104,7 @@ class FinanceCrew():
         return Task(
             config=self.tasks_config['optimizated_investment_scenarios'],
             agent=self.financial_optimizer(),
+            output_pydantic=OptimizedInvestmentReport
         )
 
     @crew

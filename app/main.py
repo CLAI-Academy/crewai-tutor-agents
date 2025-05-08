@@ -96,7 +96,7 @@ class RouterFlow(Flow[InitialState]):
 
 if __name__ == "__main__":
     # Inicializar estado
-    mensaje = "Hola, ¿cómo estás hoy?"
+    mensaje = "Quiero invertir 100 al mes sin riesgo"
 
     # Crear y ejecutar el flujo
     flow = RouterFlow()
