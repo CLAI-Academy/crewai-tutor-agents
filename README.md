@@ -1,5 +1,13 @@
 # AI Agents Docker Environment
 
+<div align="center">
+  <img src="public/Logo-completo.png" alt="CrewAI Tutor Agents Logo" width="400"/>
+</div>
+
+## Descripción del Proyecto
+
+Este es un proyecto con fines educativos en el que exploramos cómo mejorar la experiencia de usuario en aplicaciones de IA, utilizando websockets para comunicación en tiempo real y CrewAI como framework de orquestación de agentes. El objetivo es crear un entorno interactivo donde los agentes de IA puedan colaborar y resolver tareas complejas mientras mantienen una comunicación fluida con el usuario.
+
 Este repositorio contiene la configuración de Docker para ejecutar un entorno de desarrollo para agentes de IA basados en Python, con soporte para aplicaciones y Jupyter Notebooks.
 
 ## Prerequisitos
@@ -157,54 +165,68 @@ proyecto/
 ├── Makefile                # Comandos para ejecutar diferentes tareas
 ├── pyproject.toml          # Configuración de Poetry y dependencias
 ├── poetry.lock             # Archivo de bloqueo para versiones exactas de dependencias
+├── notebooks/              # Directorio para Jupyter Notebooks
 └── README.md               # Este archivo
 ```
 
-## Configuración Inicial
+## Cómo clonar e iniciar el proyecto
 
-1. **Clona el repositorio** (si aplica):
-
-   ```bash
-   git clone <url-del-repositorio>
-   cd <nombre-del-repositorio>
-   ```
-
-2. **Archivo .env** (opcional):
-   Crea un archivo `.env` en la raíz del proyecto para almacenar variables de entorno:
-   ```
-   OPENAI_API_KEY=sk-...
-   ```
-
-## Iniciar los Servicios
-
-### Para iniciar la aplicación principal:
+### 1. Clonar el repositorio
 
 ```bash
-docker-compose up ai-agent
+git clone https://github.com/tu-usuario/crewai-tutor-agents.git
+cd crewai-tutor-agents
 ```
 
-### Para iniciar Jupyter Notebook:
+### 2. Configurar el archivo de variables de entorno
+
+Copia el archivo plantilla `.env-template` a `.env` y añade tus claves API:
 
 ```bash
-docker-compose up jupyter
+cp .env-template .env
 ```
 
-### Para iniciar ambos servicios:
+Edita el archivo `.env` para incluir tus claves API:
+```
+OPENAI_API_KEY=tu_clave_de_openai
+ANTHROPIC_API_KEY=tu_clave_de_anthropic
+# ... otras variables según sea necesario
+```
+
+### 3. Iniciar el proyecto con Docker (recomendado)
+
+Docker ya está completamente configurado y listo para usar. Simplemente ejecuta:
 
 ```bash
+# Para iniciar todos los servicios
 docker-compose up
+
+# O para construir e iniciar en el primer uso
+docker-compose up --build
 ```
 
-### Para construir e iniciar (primera vez o después de cambios en Dockerfile):
+### 4. Alternativamente, para desarrollo local con Poetry
+
+Si prefieres trabajar sin Docker, usando Poetry directamente:
 
 ```bash
-docker-compose up --build
+# Instalar todas las dependencias del proyecto
+poetry install
+
+# Activar el entorno virtual
+poetry shell
+
+# Iniciar la aplicación
+make dev
+
+# O iniciar Jupyter Notebook
+make jupyter
 ```
 
 ## Acceder a los Servicios
 
 - **Aplicación principal**: http://localhost:8000
-- **Jupyter Notebook**: http://localhost:8888
+- **Jupyter Notebook**: http://localhost:8888 (sin contraseña)
 
 ## Comandos Útiles
 
@@ -327,3 +349,4 @@ Si enfrentas problemas con Poetry dentro de los contenedores:
    ```bash
    docker-compose exec ai-agent poetry install
    ```
+
