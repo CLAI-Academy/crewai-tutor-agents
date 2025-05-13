@@ -10,33 +10,29 @@ from openai import OpenAI
 from typing import Optional
 
 @tool
-def analyze_image(image: str, prompt: Optional[str] = "What is in this image?") -> str:
+def analyze_image(image: str, prompt: Optional[str] = "Realiza un diagnóstico capilar detallado de esta imagen. Analiza: grosor del cabello, longitud, altura de tono base (1-10), porcentaje de canas, color natural, matiz, textura, presencia de mechas o tratamientos químicos, porosidad y condición general. Usa terminología técnica profesional de peluquería.") -> str:
     """
-    Analiza una imagen utilizando el modelo GPT-4 Vision de OpenAI.
+    Analiza una imagen de cabello utilizando el modelo GPT-4 Vision de OpenAI para realizar diagnóstico capilar.
     
     Args:
-        image_path: Ruta al archivo de imagen a analizar
-        prompt: Pregunta o prompt específico para analizar la imagen (opcional)
+        image: URL de la imagen a analizar
+        prompt: Instrucciones específicas para analizar la imagen (opcional)
     
     Returns:
-        str: Descripción o análisis de la imagen
+        str: Análisis detallado de la imagen del cabello en formato estructurado
     """
     try:
         # Inicializar el cliente de OpenAI
         client = OpenAI()
         
-        # # Codificar la imagen en base64
-        # def encode_image(image_path):
-        #     with open(image_path, "rb") as image_file:
-        #         return base64.b64encode(image_file.read()).decode("utf-8")
-        
-        # # Obtener la imagen en formato base64
-        # base64_image = encode_image(image_path)
-        
-        # Crear la solicitud a la API
+        # Crear la solicitud a la API con un prompt específico para diagnóstico capilar
         response = client.chat.completions.create(
-            model="gpt-4o-mini",  # Asegurarse de usar el modelo correcto
+            model="gpt-4o-mini",
             messages=[
+                {
+                    "role": "system",
+                    "content": "Eres un experto en diagnóstico capilar y colorimetría profesional. Tu tarea es analizar imágenes de cabello y proporcionar un diagnóstico técnico detallado. Debes estructurar tu respuesta para que sea fácilmente convertible a formato JSON."
+                },
                 {
                     "role": "user",
                     "content": [
@@ -53,7 +49,7 @@ def analyze_image(image: str, prompt: Optional[str] = "What is in this image?") 
                     ],
                 }
             ],
-            max_tokens=300  # Ajustar según necesidades
+            max_tokens=600  # Aumentado para permitir respuestas más detalladas
         )
         
         # Extraer y retornar la respuesta

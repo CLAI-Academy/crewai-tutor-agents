@@ -1,54 +1,129 @@
 hair_diagno_generation:
   description: "1. PRIMERO: analiza la imagen {image}.
 
-    3. TERCERO: Estructura el diagnóstico en el formato indicado en el expected_output, e incluye la URL pública retornada por la herramienta de upload.
+    3. TERCERO: Estructura el diagnóstico en el formato JSON indicado en el expected_output, e incluye la URL pública retornada por la herramienta de upload.
 
-    Es OBLIGATORIO que uses AMBAS herramientas en este orden."
-  expected_output:
-    "Informe de diagnóstico capilar estructurado que contenga las siguientes secciones claramente identificadas:
-    1. Altura de tono base (valor numérico con descripción)
-    2. Porcentaje de canas (valor porcentual aproximado; 0% 25% 50% 75% 100%)
-    3. Análisis de color en medios y puntas (descripción detallada con terminología técnica)
-    4. Descripción del tono (familia de color, subtono, matices)
-    5. Características y condición del cabello (análisis estructural completo)
-    El informe debe utilizar terminología profesional de colorimetría y estar presentado en un formato claro y conciso. Pero utilizando un lenguaje simple para que un adolecente lo pueda entender.
-    Incluir además la URL de la imagen almacenada en Cloudflare."
+    Es OBLIGATORIO que uses AMBAS herramientas en este orden. DEBES DEVOLVER UN JSON VÁLIDO según el formato especificado."
+  expected_output: |
+    ```json
+    {
+      "cliente": {
+        "fecha_diagnostico": "YYYY-MM-DD"
+      },
+      "cabello": {
+        "grosor": "fino|normal|grueso|muy_fino",
+        "longitud": "muy_corto|corto|melena_corta|melena_media|melena_larga",
+        "altura_tono": {
+          "valor": 1-10,
+          "descripcion": "descripción detallada del tono"
+        },
+        "canas": {
+          "porcentaje": 0|10|25|50|75|100,
+          "descripcion": "descripción de distribución de canas"
+        },
+        "matiz": "dorado|ceniza|cobrizo|rojizo",
+        "textura": "liso|ondulado|rizado|crespo",
+        "alteraciones": {
+          "mechas": true|false,
+          "tecnica_usada": "nombre de la técnica si aplica",
+          "porosidad": {
+            "minima": 1-5,
+            "maxima": 1-5,
+            "descripcion": "descripción de la porosidad"
+          },
+          "tratamientos": {
+            "planchado": true|false,
+            "lisado_quimico": true|false,
+            "moldeado": true|false,
+            "decolorado": true|false,
+            "otro": "descripción si aplica"
+          }
+        },
+        "analisis_color": {
+          "raices": "descripción del color en raíces",
+          "medios": "descripción del color en medios",
+          "puntas": "descripción del color en puntas"
+        },
+        "condicion_general": "descripción general de la condición del cabello"
+      },
+      "imagen_url": "URL de la imagen analizada",
+      "observaciones": "observaciones adicionales importantes"
+    }
+    ```
 
 color_suggestion_generation:
   description: "Basándote en el diagnóstico capilar previo, debes:
 
     1. PRIMERO: Analiza la imagen {image}
     3. TERCERO: A partir de ambos análisis (el diagnóstico previo y tu análisis directo),
-    formula una receta de coloración profesional detallada incluyendo:
-    - Formulación técnica completa
-    - Consideraciones especiales según las características del cabello
-    - Recomendaciones de cuidado posterior
-    - Plan de mantenimiento personalizado
-    - Explicación detallada de tu razonamiento
+    formula una receta de coloración profesional detallada.
 
-    Es OBLIGATORIO que uses la herramienta con el valor correcto de {image} y que incluyas
-    su output completo en tu respuesta final."
+    Es OBLIGATORIO que uses la herramienta con el valor correcto de {image}.
+    DEBES DEVOLVER UN JSON VÁLIDO según el formato especificado en expected_output."
 
-  expected_output: "Tu respuesta debe seguir este formato exacto:
-
-
-
-    ## Formulación Profesional:
-    1. Nombre de la mezcla: [nombre descriptivo]
-    2. Tipo de mezcla: [tipo]
-    3. Nombre de la coloración: [nombre]
-    4. Tipo de coloración: [tipo]
-    5. Descripción detallada: [descripción]
-    6. Componentes:
-    - [código]: [cantidad]
-    - [código]: [cantidad]
-    7. Volumen del revelador: [volumen]
-    8. Tiempo de aplicación: [tiempo]
-
-    ## Consideraciones Especiales:
-    - [consideración 1]
-    - [consideración 2]
-    - [consideración 3]
+  expected_output: |
+    ```json
+    {
+      "coloracion": {
+        "fecha": "YYYY-MM-DD",
+        "formulacion": {
+          "nombre_mezcla": "nombre descriptivo de la mezcla",
+          "tipo_mezcla": "tipo de mezcla recomendada",
+          "marca": "marca recomendada",
+          "grama": "cantidad total en gramos",
+          "componentes": [
+            {
+              "color": "código del color 1",
+              "gramos": "cantidad en gramos"
+            },
+            {
+              "color": "código del color 2",
+              "gramos": "cantidad en gramos"
+            }
+          ],
+          "oxidante": {
+            "volumen": "10|20|30|40",
+            "gramos_ml": "cantidad en gramos o ml"
+          },
+          "tiempo_exposicion": "tiempo en minutos"
+        },
+        "aplicacion": {
+          "raices": {
+            "color": "color aplicado raíces",
+            "porcentaje_porosidad": 1-5
+          },
+          "medios": {
+            "color": "color aplicado medios",
+            "porcentaje_porosidad": 1-5
+          },
+          "puntas": {
+            "color": "color aplicado puntas",
+            "porcentaje_porosidad": 1-5
+          }
+        },
+        "color_obtenido": "descripción del color resultante esperado",
+        "reequilibrio_ph": {
+          "champu_acido": true|false,
+          "acondicionador": true|false,
+          "plex": true|false,
+          "otro": "descripción si aplica"
+        },
+        "recomendaciones": [
+          "recomendación de cuidado 1",
+          "recomendación de cuidado 2",
+          "recomendación de cuidado 3"
+        ],
+        "mantenimiento": {
+          "frecuencia": "cada X semanas",
+          "productos_recomendados": [
+            "producto 1",
+            "producto 2"
+          ]
+        }
+      },
+      "observaciones": "observaciones adicionales importantes"
+    }
+    ```
 
     ## Cuidados Posteriores a la Aplicación:
     - [recomendación 1]
