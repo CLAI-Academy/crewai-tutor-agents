@@ -350,3 +350,4 @@ Si enfrentas problemas con Poetry dentro de los contenedores:
    docker-compose exec ai-agent poetry install
    ```
 
+MIT Licence
